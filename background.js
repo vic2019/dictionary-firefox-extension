@@ -4,8 +4,18 @@ function handleError(err) {
   console.log(`Error: ${err}`);
 }
 
+function handleMessage(msg) {
+  selectedText = msg;
+}
+
+let selectedText = "";
+
+browser.runtime.onMessage.addListener(handleMessage);
 browser.commands.onCommand.addListener((command) => {
-  if (command === "popup-window") {  
+  if (command === "popup-window" && selectedText) {
+
+    console.log(selectedText);
+
     browser.windows.create({
       url: "public/popup_window.html",
       type: "popup",

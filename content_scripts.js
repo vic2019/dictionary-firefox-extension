@@ -1,12 +1,19 @@
 "user strict";
 
-function sendSelection() {
-  const selectedText = window.getSelection().toString().trim();
-  if (selectedText)  {
-    console.log(selectedText);
-  }
+function handleResponse(res) {
+  return;
 }
 
-document.addEventListener("mouseup", sendSelection);
+function handleError(err) {
+  console.log(`Error: ${err}`);
+}
 
+function sendSelection() {
+  const selectedText = window.getSelection().toString().trim();
+  if (!selectedText) return;
+  
+  const sending = browser.runtime.sendMessage(selectedText);
+  sending.then(handleResponse, handleError);
+}
 
+window.addEventListener("mouseup", sendSelection);
