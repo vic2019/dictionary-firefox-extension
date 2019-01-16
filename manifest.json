@@ -8,6 +8,8 @@
     "scripts": ["background.js"]
   },
 
+  "web_accessible_resources": ["public/popup_window.html"],
+  
   "commands": {
     "popup-window": {
       "suggested_key": { "default": "Command+Shift+S"}

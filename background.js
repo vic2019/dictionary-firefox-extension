@@ -1,23 +1,27 @@
 "use strict";
 
-// function onCreated(windowInfo) {
-//   console.log(`Created window: ${windowInfo.id}`);
-// }
-
-// function onError(error) {
-//   console.log(`Error: ${error}`);
-// }
+function handleError(err) {
+  console.log(`Error: ${err}`);
+}
 
 browser.commands.onCommand.addListener((command) => {
-  if (command === "popup-window") {
-    const createWindow = browser.windows.create({
-      url: "./popup_window.html",
+  if (command === "popup-window") {  
+    browser.windows.create({
+      url: "public/popup_window.html",
       type: "popup",
-      height:500,
-      width: 500,
-    });
-
-    // createWindow.then(onCreated, onError);
-  }
-
+      height:300,
+      width: 300, 
+    })   
+    .catch(handleError);
+  } 
 });
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
