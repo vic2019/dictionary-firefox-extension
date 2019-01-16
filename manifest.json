@@ -1,0 +1,17 @@
+{
+
+  "manifest_version": 2,
+  "name": "Wordie",
+  "version": "1.0",
+
+  "background": {
+    "scripts": ["background.js"]
+  },
+
+  "commands": {
+    "popup-window": {
+      "suggested_key": { "default": "Command+Shift+S"}
+    }
+  }
+
+}
