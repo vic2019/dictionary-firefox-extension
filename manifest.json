@@ -8,6 +8,11 @@
     "scripts": ["background.js"]
   },
 
+  "content_scripts": [{
+      "matches": ["<all_urls>"],
+      "js": ["content_scripts.js"]  
+    }],
+
   "web_accessible_resources": ["public/popup_window.html"],
   
   "commands": {
