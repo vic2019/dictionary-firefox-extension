@@ -9,11 +9,12 @@ function handleError(err) {
 }
 
 function sendSelection() {
-  const selectedText = window.getSelection().toString().trim();
-  if (!selectedText) return;
+  const selectedText = document.getSelection();
+  if (selectedText.isCollapsed) return null;
   
-  const sending = browser.runtime.sendMessage(selectedText);
+  const sending = 
+      browser.runtime.sendMessage(selectedText.toString().trim());
   sending.then(handleResponse, handleError);
 }
 
-window.addEventListener("mouseup", sendSelection);
+addEventListener("mouseup", sendSelection);
