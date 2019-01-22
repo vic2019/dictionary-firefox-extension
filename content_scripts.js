@@ -1,3 +1,5 @@
+"user strict";
+
 function createPopup(event) {
   const selection = window.getSelection();
   if (selection.isCollapsed) return;
@@ -7,67 +9,48 @@ function createPopup(event) {
   // sendInfo.then(updatePopup)
   // .catch();
 
-  showLoadingPage(selection);
+  showPopup(selection);
 }
 
-function showLoadingPage(selection) {
+function showPopup(selection) {
   const selectionCoords = selection.getRangeAt(0).getBoundingClientRect();
+  const anchorCoords = getAnchorCoords(selectionCoords);
   
   const popupDiv = document.createElement('div');
   popupDiv.className = 'wordiePopup';
-  
+  // popupDiv.style.width = '300px';
+  popupDiv.style.top = anchorCoords.top + 'px';
+  popupDiv.style.left = anchorCoords.left + 'px';
+  popupDiv.style.position = 'absolute';
+  popupDiv.style.zIndex = 1000;
+  popupDiv.style.hidden = false;
   popupDiv.innerHTML = "<p>Searching...</p>"
   popupDiv.style.background = '#7fcfcf';
-  popupDiv.style.position = 'sticky';
-  popupDiv.style.zIndex = 100;
   document.body.append(popupDiv);
-  
-  let top = selectionCoords.top - popupDiv.offsetHeight - 4;
-  if (top < 0) {
-    top = selectionCoords.bottom + 4;
-  }
 
-  
-  let left = selectionCoords.right + 4;
-  if (left + popupDiv.offsetWidth > document.documentElement.clientWidth) {
-    left = document.documentElement.clientWidth - popupDiv.offsetWidth - 2;
-  }
-
-  popupDiv.style.left = left + 'px';
-  popupDiv.style.top = top + 'px';
 }
+    
+function getAnchorCoords(selectionCoords) {
+  const top = selectionCoords.top + pageYOffset;
+  const bottom = top + selectionCoords.height;
+  const left = selectionCoords.left + pageXOffset;
+  const right = left + selectionCoords.width;
 
+  return {
+    top: top,
+    bottom: bottom,
+    left: left,
+    right: right,
+  };
+}
 
 document.addEventListener("dblclick", createPopup);
 
-
-// "user strict";
-
-// function handleResponse(res) {
-//   return;
-// }
-
-// function handleError(err) {
-//   console.log(`Error: ${err}`);
-// }
-
-// function sendSelection() {
-//   const selectedText = document.getSelection();
-//   if (selectedText.isCollapsed) return null;
-  
-//   const sending = 
-//       browser.runtime.sendMessage(selectedText.toString().trim());
-//   sending.then(handleResponse, handleError);
-// }
-
-
 // content
-// 	altMouseup
 // 	createPopup
 //    sendInfo
-// 		showLoading
+// 		createDiv
 // 	  updatePopup
 //  
-// 	
 // 	removePopup (click)
 // 	saveEntry
