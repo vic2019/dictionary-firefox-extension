@@ -12,10 +12,6 @@ function createPopup(event) {
 
 }
 
-function altSelect(event) {
-  if (event.altKey) createPopup(event);
-}
-
 function showLoadingPage(selection) {
   const selectionCoords = selection.getRangeAt(0).getBoundingClientRect();
   
