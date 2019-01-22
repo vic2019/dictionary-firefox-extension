@@ -8,8 +8,6 @@ function createPopup(event) {
   // .catch();
 
   showLoadingPage(selection);
-
-
 }
 
 function showLoadingPage(selection) {
@@ -18,30 +16,30 @@ function showLoadingPage(selection) {
   const popupDiv = document.createElement('div');
   popupDiv.className = 'wordiePopup';
   
-  popupDiv.innerHTML = "<p> blah <br> <br> blah blah</p>"
+  popupDiv.innerHTML = "<p>Searching...</p>"
   popupDiv.style.background = '#7fcfcf';
-  popupDiv.style.position = 'fixed';
+  popupDiv.style.position = 'sticky';
+  popupDiv.style.zIndex = 100;
   document.body.append(popupDiv);
   
   let top = selectionCoords.top - popupDiv.offsetHeight - 4;
   if (top < 0) {
     top = selectionCoords.bottom + 4;
   }
-  alert(`select.top: ${selectionCoords.top},\npopup.offsetHeight: ${popupDiv.offsetHeight},\ntop: ${top}`);
+
   
   let left = selectionCoords.right + 4;
   if (left + popupDiv.offsetWidth > document.documentElement.clientWidth) {
     left = document.documentElement.clientWidth - popupDiv.offsetWidth - 2;
   }
-  // alert(typeof popupDiv.offsetHeight);
-  // alert(typeof selectionCoords.top);
+
   popupDiv.style.left = left + 'px';
   popupDiv.style.top = top + 'px';
 }
 
 
-addEventListener("dblclick", createPopup);
-addEventListener("mouseup", altSelect);
+document.addEventListener("dblclick", createPopup);
+
 
 // "user strict";
 

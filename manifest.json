@@ -12,14 +12,6 @@
       "matches": ["<all_urls>"],
       "all_frames": true,
       "js": ["content_scripts.js"]  
-    }],
-
-  "web_accessible_resources": ["public/popup_window.html"],
-  
-  "commands": {
-    "popup-window": {
-      "suggested_key": { "default": "Command+Shift+S"}
-    }
-  }
+    }]
 
 }
