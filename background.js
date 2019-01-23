@@ -1,30 +1,47 @@
-// "use strict";
+"use strict";
 
 // function handleError(err) {
 //   console.log(`Error: ${err}`);
 // }
 
-function handleMessage(vocab) {
-  console.log(vocab);
+function lookUpWord(word) {
+  const KEY = '';
+  const requestUrl = `https://www.dictionaryapi.com/api/v3/references/learners/json/${word}?key=${KEY}`;
+  console.log(requestUrl);
+
+  const httpRequest = new XMLHttpRequest();
+  if (!httpRequest) return false;
+
+  httpRequest.onreadystatechange = handleResponse;
+  httpRequest.open('GET', requestUrl);
+  httpRequest.send();
 }
 
-// let selectedText = null;
+function handleResponse() {
+  if (this.readyState === XMLHttpRequest.DONE) {
+    if (this.status === 200) {
+      const response = JSON.parse(this.responseText);
+      console.log(response);
 
-browser.runtime.onMessage.addListener(handleMessage);
-// browser.commands.onCommand.addListener((command) => {
-//   if (command === "popup-window" && selectedText) {
+      // console.log(response.hwi.hw);
+      // console.log(response.shortdef[0]);
 
-//     console.log(selectedText);
+    } else {
+      console.log(this.status);
+    }
+  } else {
+    console.log(this.readyState.toString());
+  }
+  
+}
 
-//     browser.windows.create({
-//       url: "public/popup_window.html",
-//       type: "popup",
-//       height: 300,
-//       width: 300, 
-//     })
-//     .catch(handleError);
-//   } 
-// });
+
+
+
+
+
+browser.runtime.onMessage.addListener(lookUpWord);
+
   
   
   

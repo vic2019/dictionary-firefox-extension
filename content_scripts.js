@@ -33,7 +33,6 @@ function setPopup(selection) {
   document.body.append(popupDiv);
   
   // Set popup position
-  // * Need to figure out how to get precise height & width *
   let top = anchorCoords.top - popupDiv.offsetHeight - 15;
   let left = anchorCoords.left + 
   (anchorCoords.right - anchorCoords.left - popupDiv.offsetWidth ) / 2;
