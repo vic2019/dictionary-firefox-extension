@@ -60,7 +60,7 @@ function parseItem(item, itemKey) {
   itemElem.className = itemKey;
 
   if (Array.isArray(item)) {
-    for (let subItem of item) {
+    for (let subItem of item.slice(1)) {
       itemElem.append(parseItem(subItem, subItem[0])); 
     }
     return itemElem;
