@@ -4,12 +4,38 @@ function createPopup(event) {
   const selection = window.getSelection();
   if (selection.isCollapsed) return;
   
-  const sendInfo = browser.runtime.sendMessage(
-    selection.toString().trim());
-  // sendInfo.then(updatePopup)
-  // .catch();
-
+  lookUpWord(selection.toString().trim());
+ 
   const popupDiv = setPopup(selection);
+
+
+}
+
+function lookUpWord(word) {
+ 
+  const KEY = '';
+  const requestUrl = `https://www.dictionaryapi.com/api/v3/references/learners/json/${word}?key=${KEY}`;
+  
+  const httpRequest = new XMLHttpRequest();
+  if (!httpRequest) return false;
+  
+  httpRequest.onreadystatechange = handleResponse;
+  httpRequest.open('GET', "http://learnersdictionary.com/definition/ok");
+  httpRequest.send();
+  
+}
+
+function handleResponse(err) {
+  if (this.readyState !== XMLHttpRequest.DONE) return;
+  if (this.status !== 200) {
+    return;
+  }
+  
+  alert(this.status);
+  
+  // const responseJSON = JSON.parse(this.responseText);   
+  // const defElem = parseDef(responseJSON[0]['def'], 'def');
+    
 
 }
 
@@ -82,8 +108,12 @@ function removePopup(event) {
   }
 }
 
+
+
 document.addEventListener("dblclick", createPopup);
 document.addEventListener("click", removePopup);
+
+
 
 // ~content
 // 	~createPopup
