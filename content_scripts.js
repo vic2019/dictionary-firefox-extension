@@ -1,45 +1,43 @@
 "user strict";
 
-function createPopup(event) {
+function createPopup() {
   const selection = window.getSelection();
   if (selection.isCollapsed) return;
   
-  lookUpWord(selection.toString().trim());
- 
-  const popupDiv = setPopup(selection);
-
-
+  const popupDiv = showPopup(selection);
+  
+  const word = selection.toString().trim();
+  sendRequest(word);
+  
 }
 
-function lookUpWord(word) {
- 
+function sendRequest(word) {
   const KEY = '';
-  const requestUrl = `https://www.dictionaryapi.com/api/v3/references/learners/json/${word}?key=${KEY}`;
+  const requestUrl = `https://www.dictionaryapi.com/api/v1/references/learners/xml/${word}?key=${KEY}`;
   
   const httpRequest = new XMLHttpRequest();
-  if (!httpRequest) return false;
+  if (!httpRequest) updatePopup(false);
   
   httpRequest.onreadystatechange = handleResponse;
-  httpRequest.open('GET', "http://learnersdictionary.com/definition/ok");
+  httpRequest.open('GET', requestUrl);
   httpRequest.send();
   
 }
 
-function handleResponse(err) {
-  if (this.readyState !== XMLHttpRequest.DONE) return;
-  if (this.status !== 200) {
-    return;
-  }
+function handleResponse() {
+  if (this.readyState !== 4 || this.status !== 200) return;
   
-  alert(this.status);
-  
-  // const responseJSON = JSON.parse(this.responseText);   
-  // const defElem = parseDef(responseJSON[0]['def'], 'def');
-    
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(this.responseText, 'text/xml');
 
+  console.log(xmlDoc.toString());  
 }
 
-function setPopup(selection) {
+function updatePopup(content) {
+  alert(content);
+}
+
+function showPopup(selection) {
   // Set anchor 
   const selectionCoords = selection.getRangeAt(0).getBoundingClientRect();
   const anchorCoords = getAnchorCoords(selectionCoords);

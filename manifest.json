@@ -2,7 +2,7 @@
 
   "manifest_version": 2,
   "name": "Wordie",
-  "version": "1.0",
+  "version": "1.0.0",
 
   "background": {
     "scripts": ["background.js"]
@@ -15,8 +15,7 @@
   }],
 
   "permissions": [
-    "*://learnersdictionary.com/definition/*",
-    "webRequest"
+    "*://www.dictionaryapi.com/api/v1/references/learners/xml/*"
   ]
 
 }
