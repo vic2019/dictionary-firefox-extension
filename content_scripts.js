@@ -7,9 +7,9 @@ function createPopup() {
   const popupDiv = showPopup(selection);
   
   const word = selection.toString().trim();
-  sendRequest(word);
-  
+  sendRequest(word); 
 }
+
 
 function sendRequest(word) {
   const KEY = '';
@@ -20,22 +20,46 @@ function sendRequest(word) {
   
   httpRequest.onreadystatechange = handleResponse;
   httpRequest.open('GET', requestUrl);
-  httpRequest.send();
-  
+  httpRequest.send(); 
 }
+
 
 function handleResponse() {
   if (this.readyState !== 4 || this.status !== 200) return;
+  // How to handle error?
   
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(this.responseText, 'text/xml');
 
-  console.log(xmlDoc.toString());  
+  //Need to check whether the word is available first
+  const content = parseXmlObject(xmlDoc.getElementsByTagName('entry_list')[0]);
+  updatePopup(content);
 }
 
-function updatePopup(content) {
-  alert(content);
+
+function parseXmlObject(xmlNode) {
+  const selfElem = document.createElement('div');
+  selfElem.className = xmlNode.tagName;
+
+  if (!xmlNode.hasChildNodes()) return selfElem;
+
+  for (let child of xmlNode.childNodes) {
+    if (child.nodeType === 3) {
+      selfElem.append(child.nodeValue);
+    } else if ( child.nodeType === 1) {
+      selfElem.append(parseXmlObject(child));
+    }
+  }
+
+  return selfElem;  
 }
+
+
+function updatePopup(content) {
+  const popupDiv = document.body.getElementsByClassName('wordiePopup');
+  popupDiv[popupDiv.length-1].append(content);
+}
+
 
 function showPopup(selection) {
   // Set anchor 
@@ -54,6 +78,7 @@ function showPopup(selection) {
   popupDiv.style.boxShadow = "3px 5px 6px rgba(0, 0, 0, .1)";
   popupDiv.style.height = '370px';
   popupDiv.style.width = '330px';
+  popupDiv
   document.body.append(popupDiv);
   
   // Set popup position
@@ -80,10 +105,10 @@ function showPopup(selection) {
   popupDiv.style.position = 'absolute';
   popupDiv.style.zIndex = 1000;
 
-  
   return popupDiv;
 }
-    
+  
+
 function getAnchorCoords(selectionCoords) {
   const top = selectionCoords.top + pageYOffset;
   const bottom = top + selectionCoords.height;
@@ -98,6 +123,7 @@ function getAnchorCoords(selectionCoords) {
   };
 }
 
+
 function removePopup(event) {
   if (!event.target.classList.contains('wordiePopup')) {
     document.querySelectorAll('.wordiePopup').forEach((elem) => {
@@ -105,7 +131,6 @@ function removePopup(event) {
     });
   }
 }
-
 
 
 document.addEventListener("dblclick", createPopup);
