@@ -1,5 +1,6 @@
 "user strict";
 
+
 function createPopup() {
   const selection = window.getSelection();
   if (selection.isCollapsed) return;
@@ -12,7 +13,7 @@ function createPopup() {
 
 
 function sendRequest(word) {
-  const KEY = '';
+  const KEY = '82d19a2e-151a-40be-bf7d-451a70a065a3';
   const requestUrl = `https://www.dictionaryapi.com/api/v1/references/learners/xml/${word}?key=${KEY}`;
   
   const httpRequest = new XMLHttpRequest();
@@ -56,8 +57,12 @@ function parseXmlObject(xmlNode) {
 
 
 function updatePopup(content) {
-  const popupDiv = document.body.getElementsByClassName('wordiePopup');
-  popupDiv[popupDiv.length-1].append(content);
+  const popupDivs = document.body.getElementsByClassName('wordiePopup');
+  const popupDiv = popupDivs[popupDivs.length - 1];
+  popupDiv.innerHTML = '';
+  popupDiv.style.textAlign = 'left';
+  popupDiv.style.lineHeight = 1.2;
+  popupDiv.append(content);
 }
 
 
@@ -70,44 +75,54 @@ function showPopup(selection) {
   const popupDiv = document.createElement('div');
 
   popupDiv.className = 'wordiePopup';
-  popupDiv.style.padding = "20px 30px";
+  popupDiv.style.background = '#d9f2e6';
   popupDiv.style.border = "2px solid #8cd9b3";
   popupDiv.style.borderRadius = "9px";
-  popupDiv.style.textAlign = "center";
-  popupDiv.style.background = '#d9f2e6';
+  popupDiv.style.margin = "0px";
+  popupDiv.style.padding = "12px 16px";
+  popupDiv.style.height = '380px';
+  popupDiv.style.width = '350px';
   popupDiv.style.boxShadow = "3px 5px 6px rgba(0, 0, 0, .1)";
-  popupDiv.style.height = '370px';
-  popupDiv.style.width = '330px';
-  popupDiv
-  document.body.append(popupDiv);
-  
+  popupDiv.style.textAlign = 'center';
+  popupDiv.style.lineHeight = 25;
+  popupDiv.style.fontFamily = 'Arial, Helvetica, sans-serif';
+  popupDiv.style.overflow = 'scroll';
+  popupDiv.innerHTML = 'Searching...'
+
   // Set popup position
-  let top = anchorCoords.top - popupDiv.offsetHeight - 15;
+  const offsetHeight = 408;
+  const offsetWidth = 386;
+  const scrollHeight = document.documentElement.scrollHeight;
+  const clientWidth = document.documentElement.clientWidth;
+  
+  let top = anchorCoords.top - offsetHeight - 8;
   let left = anchorCoords.left + 
-  (anchorCoords.right - anchorCoords.left - popupDiv.offsetWidth ) / 2;
+  (anchorCoords.right - anchorCoords.left - offsetWidth ) / 2;
   
-  if (top < pageYOffset) {
-    top = anchorCoords.bottom + 15;
+  // alert(`top: ${top}, offsetWidth: ${offsetWidth}, pageYOffset: ${pageYOffset}, scrollHeight: ${scrollHeight}, anchor bottom: ${anchorCoords.bottom}`);
+  
+  if (top < pageYOffset && 
+    anchorCoords.bottom + offsetHeight + 8 < scrollHeight) {
+      top = anchorCoords.bottom + 8;
+    }
+    
+    if (left < pageXOffset + 4) {
+      left = pageXOffset + 4;
+    }
+    
+    if (left > clientWidth - offsetWidth - 4) {
+    left = clientWidth - offsetWidth - 4;
   }
   
-  if (left < pageXOffset + 10) {
-    left = pageXOffset + 10;
-  }
-
-  if (left > document.documentElement.clientWidth - 
-    popupDiv.offsetWidth - 10) {
-    left = document.documentElement.clientWidth - 
-    popupDiv.offsetWidth - 10;
-  }
-
   popupDiv.style.top = top + 'px';
   popupDiv.style.left = left + 'px';
   popupDiv.style.position = 'absolute';
   popupDiv.style.zIndex = 1000;
-
+  document.body.append(popupDiv);
+  
   return popupDiv;
 }
-  
+
 
 function getAnchorCoords(selectionCoords) {
   const top = selectionCoords.top + pageYOffset;
