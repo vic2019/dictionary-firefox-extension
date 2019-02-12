@@ -62,7 +62,24 @@ function updatePopup(content) {
   popupDiv.innerHTML = '';
   popupDiv.style.textAlign = 'left';
   popupDiv.style.lineHeight = 1.2;
-  popupDiv.append(content);
+  popupDiv.append(content);     
+  
+  const stylesheet = {
+    hw: {
+      fontWeight: 'bold'
+    },
+    it: {
+      fontStyle: 'italic'
+    }
+  }
+  
+  for (let className of Object.keys(stylesheet)) {
+    for (let property of Object.keys(stylesheet[className])) {
+      Array.from(popupDiv.getElementsByClassName(className)).forEach(
+        elem => elem.style[property] = stylesheet[className][property]
+      );
+    }
+  } 
 }
 
 
