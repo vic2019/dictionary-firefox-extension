@@ -13,7 +13,7 @@ function createPopup() {
 
 
 function sendRequest(word) {
-  const KEY = '82d19a2e-151a-40be-bf7d-451a70a065a3';
+  const KEY = '';
   const requestUrl = `https://www.dictionaryapi.com/api/v1/references/learners/xml/${word}?key=${KEY}`;
   
   const httpRequest = new XMLHttpRequest();
