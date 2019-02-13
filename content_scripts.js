@@ -64,21 +64,117 @@ function updatePopup(content) {
   popupDiv.style.lineHeight = 1.2;
   popupDiv.append(content);     
   
-  const stylesheet = {
-    hw: {
-      fontWeight: 'bold'
-    },
-    it: {
-      fontStyle: 'italic'
-    }
+  const css = {
+    hw: `
+      padding-top: 2%;
+      padding-bottom: 2%;
+      font-size: 130%; 
+      font-weight: bold;
+      display: inline;
+    `,
+    sound: `
+      display: none;
+    `,
+    pr: `
+      display: none;
+    `,
+    fl: `
+      color: #787878;
+      padding-top: 1%;
+      padding-bottom: 1%;
+      font-style: italic;
+      display: inline;
+    `,
+    in: `
+      padding-top: 2%;
+      padding-bottom: 1%;
+    `,
+    dt: `
+      display: inline;
+      padding-top: 1%;
+      padding-bottom: 1%;
+    `,
+    il: `
+      color: #787878;
+      font-style: italic;
+      display: inline;
+    `,
+    if: `
+      display: inline;
+    `,
+    sn: `
+      display: inline;
+      font-weight: bold;
+    `,
+    wsgram: `
+      color: #787878;
+      padding-top: 2%;
+      padding-bottom: 1%;
+      text-transform: uppercase;
+      font-size: 75%;
+      font-weight: bold;
+    `,
+    vi: `
+      display:list-item;
+      list-style: square inside;
+      padding-left: 5%;
+      padding-top: 1%;
+      padding-bottom: 1%;
+    `,
+    it: `
+      font-style: italic;
+      display: inline;
+    `,
+    un: `
+      padding-top: 1%;
+      padding-bottom: 1%;
+      display: inline;
+      display:list-item;
+      list-style: circle inside;
+    `,
+    snote: `
+      display: inline;
+      display:list-item;
+      list-style: circle inside;
+    `,
+    phrase: `
+      font-style: italic;
+      display: inline;
+    `,
+    dro: `
+      display: none;
+    `,
+    dx: `
+      display: none;
+    `,
+    usage: `
+      padding-top: 1%;
+      padding-bottom: 1%;
+      display: inline;
+      display:list-item;
+      list-style: circle inside;
+    `,
+    ssl: `
+      color: #787878;
+      padding-top: 1%;
+      padding-bottom: 1%;
+      font-style: italic;
+      display: inline;
+    `,
+    sgram: `
+      color: #787878;
+      padding-top: 1%;
+      padding-bottom: 1%;
+      font-style: italic;
+      display: inline;
+    `
+
   }
   
-  for (let className of Object.keys(stylesheet)) {
-    for (let property of Object.keys(stylesheet[className])) {
-      Array.from(popupDiv.getElementsByClassName(className)).forEach(
-        elem => elem.style[property] = stylesheet[className][property]
-      );
-    }
+  for (let className of Object.keys(css)) {
+    Array.from(popupDiv.getElementsByClassName(className)).forEach(
+      elem => elem.style = css[className]
+    ); 
   } 
 }
 
@@ -96,7 +192,7 @@ function showPopup(selection) {
   popupDiv.style.border = "2px solid #8cd9b3";
   popupDiv.style.borderRadius = "9px";
   popupDiv.style.margin = "0px";
-  popupDiv.style.padding = "12px 16px";
+  popupDiv.style.padding = "10px 16px";
   popupDiv.style.height = '380px';
   popupDiv.style.width = '350px';
   popupDiv.style.boxShadow = "3px 5px 6px rgba(0, 0, 0, .1)";
