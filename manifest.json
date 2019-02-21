@@ -1,5 +1,4 @@
 {
-
   "manifest_version": 2,
   "name": "Wordie",
   "version": "1.0.0",
@@ -14,8 +13,12 @@
       "js": ["content_scripts.js"]  
   }],
 
-  "permissions": [
-    "*://www.dictionaryapi.com/api/v1/references/learners/xml/*"
-  ]
+  "web_accessible_resources": [
+    "images/play_button.png"
+  ],
 
+  "permissions": [
+    "*://www.dictionaryapi.com/api/v1/references/learners/xml/*",
+    "https://media.merriam-webster.com/soundc11/*"
+  ]
 }
