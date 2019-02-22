@@ -35,18 +35,17 @@ function handleResponse() {
   const xmlDoc = parser.parseFromString(this.responseText, 'text/xml');
 
   //Need to check whether the word is available first
-  const content = parseXmlObject(xmlDoc.getElementsByTagName('entry_list')[0]);
-  updatePopup(content);
-
+  updatePopup(xmlDoc);
+  
 }
 
 
 function parseXmlObject(xmlNode) {
   const selfElem = document.createElement('span');
   selfElem.className = xmlNode.tagName;
-
+  
   if (!xmlNode.hasChildNodes()) return selfElem;
-
+  
   for (let child of xmlNode.childNodes) {
     if (child.nodeType === 3) {
       selfElem.append(child.nodeValue);
@@ -54,29 +53,29 @@ function parseXmlObject(xmlNode) {
       selfElem.append(parseXmlObject(child));
     }
   }
-
+  
   return selfElem;  
-
+  
 }
 
 
-function updatePopup(content) {
+function updatePopup(xmlDoc) {
+  const content = parseXmlObject(xmlDoc.getElementsByTagName('entry_list')[0]);
   const popupDivs = document.body.getElementsByClassName('wordiePopup');
   const popupDiv = popupDivs[popupDivs.length - 1];
   popupDiv.innerHTML = '';
   popupDiv.style.textAlign = 'left';
   popupDiv.style.lineHeight = 1.2;
   popupDiv.append(content);
-
   
   const css = {
     entry: `
     display: block;
+    padding-bottom: 1%;
     `,
     hw: `
-    padding-top: 2%;
+    padding-top: 1%;
     padding-bottom: 2%;
-    padding-right: 1%;
     font-size: 130%; 
     font-weight: bold;
     display: inline-block;
@@ -115,10 +114,14 @@ function updatePopup(content) {
     `,
     sn: `
     font-weight: bold;
+    padding-right: 1%;
+    float: left;
     `,
     sgram: `
     color: #787878;
-    font-style: italic;
+    text-transform: uppercase;
+    font-size: 75%;
+    font-weight: bold;
     `,
     slb: `
     color: #787878;
@@ -128,28 +131,31 @@ function updatePopup(content) {
     display: block;
     `,
     il: `
+    display: inline-block;
+    padding-bottom: 1%;
     color: #787878;
     font-style: italic;
     `,
     cx: `
-    padding-top: 1%;
     padding-bottom: 1%;
     display: block;
     `,
     ct: `
     font-style: italic;
     `,
-    dt: `
-    padding-left: 1%;
-    `,
     def: `
     padding-top: 1%;
     padding-bottom: 1%;
     display: block;
     `,
+    dt: `
+    clear: right;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    `,
     vt: `
     color: #787878;
-    padding-top: 2%;
+    padding-top: 1%;
     padding-bottom: 1%;
     text-transform: uppercase;
     font-size: 75%;
@@ -158,8 +164,7 @@ function updatePopup(content) {
     `,
     wsgram: `
     color: #787878;
-    padding-top: 2%;
-    padding-bottom: 1%;
+    padding-top: 1%;
     text-transform: uppercase;
     font-size: 75%;
     font-weight: bold;
@@ -167,6 +172,9 @@ function updatePopup(content) {
     `,
     gram: `
     color: #787878;
+    text-transform: uppercase;
+    font-size: 75%;
+    font-weight: bold;
     padding-top: 1%;
     padding-bottom: 1%;
     display: block;
@@ -174,7 +182,7 @@ function updatePopup(content) {
     vi: `
     display:list-item;
     list-style: square inside;
-    padding-left: 5%;
+    padding-left: 9%;
     padding-top: 1%;
     padding-bottom: 1%;
     `,
@@ -182,10 +190,6 @@ function updatePopup(content) {
     font-style: italic;
     `,
     un: `
-    display:list-item;
-    list-style: circle inside;
-    padding-top: 1%;
-    padding-bottom: 1%;
     `,
     snote: `
     display:list-item;
@@ -198,8 +202,16 @@ function updatePopup(content) {
     display:list-item;
     list-style: circle inside;
     `,
-    dro: `
-    display: none;
+    ure: `
+    display: inline-block;
+    padding-bottom: 1%;
+    font-weight: bold;
+    `,
+    dre: `
+    display: inline-block;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    font-weight: bold;
     `,
     usageref: `
     display: none;
@@ -212,6 +224,15 @@ function updatePopup(content) {
     `,
     art: `
     display: none;
+    `,
+    dxnl: `
+    display: none;
+    `,
+    dx: `
+    display: none;
+    `,
+    dxt: `
+    font-style: italic;
     `
   }
   
@@ -221,17 +242,34 @@ function updatePopup(content) {
     ); 
   }
   
-  Array.from(popupDiv.getElementsByClassName('entry')).forEach( entry => {
-    const audio = entry.getElementsByClassName('sound')[0].firstChild;
+  Array.from(popupDiv.getElementsByClassName('sound')).forEach( sound => {
+    const audio = sound.firstChild;
     const audioElem = getAudio(audio);
-    entry.getElementsByClassName('hw')[0].after(audioElem);
-
+    sound.after(audioElem);
+    
     const playButton = document.createElement('img');
     playButton.src = browser.extension.getURL("images/play_button.png");
-    playButton.onclick = playAudio(audioElem);
-    entry.getElementsByClassName('hw')[0].after(playButton);
+    playButton.onclick = () => audioElem.play();
+    // playButton.style.paddingLeft = '1%';
+    audioElem.after(playButton);
   });
+  
+  const bookmarkButton = document.createElement('img');
+  bookmarkButton.src = browser.extension.getURL("images/star-empty-19.png");
+  bookmarkButton.style.float = 'right';
+  bookmarkButton.style.position = 'sticky';
+  bookmarkButton.style.top = '0px';
+  const headword = xmlDoc.firstChild.firstChild.id.match(/[-\w\s]*/)[0];
+  bookmarkButton.onclick = bookmarkToggle(headword, bookmarkButton);
+  popupDiv.prepend(bookmarkButton);
+  
+}
 
+
+function bookmarkToggle(headword, bookmarkButton) {
+  return () => {
+    browser.runtime.sendMessage(headword);
+  }
 }
 
 
@@ -251,16 +289,13 @@ function getAudio(audio) {
   const audioElem = document.createElement('audio');
   audioElem.className = fileName;
   audioElem.src = src;
-  audioElem.display = 'none';
-  
+  audioElem.display = 'none'; 
+
   return audioElem;
 
 }
 
 
-function playAudio(audioElem) {
-  return () => audioElem.play();
-}
 
 
 function showPopup(selection) {
@@ -314,7 +349,7 @@ function showPopup(selection) {
   popupDiv.style.top = top + 'px';
   popupDiv.style.left = left + 'px';
   popupDiv.style.position = 'absolute';
-  popupDiv.style.zIndex = 1000;
+  popupDiv.style.zIndex = 16777270;
   document.body.append(popupDiv);
 
   return popupDiv;
