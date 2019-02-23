@@ -1,0 +1,223 @@
+.wordiePopup .snBox span {
+
+ }
+ 
+ .wordiePopup .snContent span {
+  padding-bottom: 1%;
+ }
+ 
+ .wordiePopup .snBox {
+  display: flex;
+  flex-flow: row;
+  align-items: baseline;
+ }
+ 
+ .wordiePopup .snContent {
+  display: flex;
+  flex-flow: column;
+  align-items: baseline;
+ }
+ 
+
+.wordiePopup .entry {
+ display: block;
+}
+
+.wordiePopup .hw {
+ display: inline-block;
+ padding-top: 2%;
+ padding-bottom: 2%;
+ padding-right: 1%;
+ font-size: 140%; 
+ font-weight: bold;
+}
+
+.wordiePopup .fl {
+ color: #787878;
+ padding-left: 1%;
+ font-weight: bold;
+ font-style: italic;
+}
+
+.wordiePopup .in {
+ display: block;
+}
+
+.wordiePopup .il { 
+  color: #787878;
+  font-style: italic;
+}
+
+.wordiePopup .if {
+
+}
+
+.wordiePopup .def {
+ display: block;
+ padding-top: 1%;
+}
+
+.wordiePopup .wsgram {
+ display: block;
+ color: #787878;
+ text-transform: uppercase;
+ padding-top: 1%;
+ font-size: 80%;
+ font-weight: bold;
+}
+
+.wordiePopup .sgram {
+ color: #787878;
+ font-style: italic;
+ font-weight: bold;
+}
+
+.wordiePopup .gram {
+ display: block;
+ color: #787878;
+ text-transform: uppercase;
+ font-size: 80%;
+ font-weight: bold;
+}
+
+.wordiePopup .sn {
+ font-weight: bold;
+ padding-right: 1%;
+}
+
+.wordiePopup .dt {
+
+}
+
+.wordiePopup .vi {
+  display:list-item;
+  list-style: square inside;
+  padding-left: 8%;
+  padding-top: 1%;
+  padding-bottom: 1%;
+}
+
+.wordiePopup .vt {
+  display: block;
+  color: #787878;
+  text-transform: uppercase;
+  font-size: 80%;
+  font-weight: bold;  
+}
+
+.wordiePopup .it {
+  font-style: italic;
+}
+
+.wordiePopup .un {
+
+}
+
+.wordiePopup .dx {
+
+}
+
+.wordiePopup .dxnl {
+
+}
+
+.wordiePopup .dxt {
+  font-style: italic;
+}
+
+.wordiePopup .snote {
+
+}
+
+.wordiePopup .snotebox {
+
+}
+
+.wordiePopup .phrase {
+  font-style: italic;
+}
+
+.wordiePopup .usage {
+
+}
+
+.wordiePopup .ure {
+  font-weight: bold;
+}
+.wordiePopup .dro {
+
+}
+.wordiePopup .dre {
+  font-weight: bold;
+}
+
+.wordiePopup .pva {
+  font-weight: bold;
+}
+
+.wordiePopup .hsl {
+  color: #787878;
+}
+.wordiePopup .ssl {
+  color: #787878;
+  font-style: italic;
+}
+.wordiePopup .sin {
+  display: block;
+}
+.wordiePopup .slb {
+  color: #787878;
+}
+.wordiePopup .cx {
+  display: block;
+}
+.wordiePopup .ct {
+  font-style: italic;
+}
+
+.wordiePopup .art {
+
+}
+.wordiePopup .altpr {
+
+}
+.wordiePopup .usageref {
+
+}
+.wordiePopup .vr {
+
+}
+.wordiePopup .lb {
+
+}
+.wordiePopup .sound {
+
+}
+.wordiePopup .pr {
+
+}
+
+.wordiePopup .art, .altpr, .usageref, .vr, .lb, .sound, .pr  {
+  display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

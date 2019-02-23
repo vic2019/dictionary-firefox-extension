@@ -14,7 +14,8 @@
   }],
 
   "web_accessible_resources": [
-    "images/play_button.png"
+    "images/play_button.png",
+    "stylesheet.css"
   ],
 
   "permissions": [

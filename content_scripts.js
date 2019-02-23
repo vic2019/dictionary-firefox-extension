@@ -5,7 +5,7 @@ function createPopup() {
   const selection = window.getSelection();
   if (selection.isCollapsed) return;
   
-  const popupDiv = showPopup(selection);
+  const popupNode = showPopup(selection);
   
   const word = selection.toString().trim();
   sendRequest(word); 
@@ -61,188 +61,23 @@ function parseXmlObject(xmlNode) {
 
 function updatePopup(xmlDoc) {
   const content = parseXmlObject(xmlDoc.getElementsByTagName('entry_list')[0]);
-  const popupDivs = document.body.getElementsByClassName('wordiePopup');
-  const popupDiv = popupDivs[popupDivs.length - 1];
-  popupDiv.innerHTML = '';
-  popupDiv.style.textAlign = 'left';
-  popupDiv.style.lineHeight = 1.2;
-  popupDiv.append(content);
+
+  arrangeSN(content);
+
+  const popupNodes = document.body.getElementsByClassName('wordiePopup');
+  const popupNode = popupNodes[popupNodes.length - 1];
+  popupNode.innerHTML = '';
+  popupNode.style.textAlign = 'left';
+  popupNode.style.lineHeight = 1.15;
+  popupNode.append(content);
   
-  const css = {
-    entry: `
-    display: block;
-    padding-bottom: 1%;
-    `,
-    hw: `
-    padding-top: 1%;
-    padding-bottom: 2%;
-    font-size: 130%; 
-    font-weight: bold;
-    display: inline-block;
-    `,
-    vr: `
-    display: none;
-    `,
-    sound: `
-    display: none;
-    `,
-    pr: `
-    display: none;
-    `,
-    fl: `
-    color: #787878;
-    font-weight: bold;
-    font-style: italic;
-    `,
-    lb: `
-    color: #787878;
-    `,
-    hsl: `
-    color: #787878;
-    display: inline;
-    `,
-    ssl: `
-    color: #787878;
-    font-style: italic;
-    `,
-    sl: `
-    color: #787878;
-    font-style: italic;
-    `,
-    sin: `
-    display: block;
-    `,
-    sn: `
-    font-weight: bold;
-    padding-right: 1%;
-    float: left;
-    `,
-    sgram: `
-    color: #787878;
-    text-transform: uppercase;
-    font-size: 75%;
-    font-weight: bold;
-    `,
-    slb: `
-    color: #787878;
-    `,
-    in: `
-    color: #787878;
-    display: block;
-    `,
-    il: `
-    display: inline-block;
-    padding-bottom: 1%;
-    color: #787878;
-    font-style: italic;
-    `,
-    cx: `
-    padding-bottom: 1%;
-    display: block;
-    `,
-    ct: `
-    font-style: italic;
-    `,
-    def: `
-    padding-top: 1%;
-    padding-bottom: 1%;
-    display: block;
-    `,
-    dt: `
-    clear: right;
-    padding-top: 1%;
-    padding-bottom: 1%;
-    `,
-    vt: `
-    color: #787878;
-    padding-top: 1%;
-    padding-bottom: 1%;
-    text-transform: uppercase;
-    font-size: 75%;
-    font-weight: bold;  
-    display: block;
-    `,
-    wsgram: `
-    color: #787878;
-    padding-top: 1%;
-    text-transform: uppercase;
-    font-size: 75%;
-    font-weight: bold;
-    display: block;
-    `,
-    gram: `
-    color: #787878;
-    text-transform: uppercase;
-    font-size: 75%;
-    font-weight: bold;
-    padding-top: 1%;
-    padding-bottom: 1%;
-    display: block;
-    `,
-    vi: `
-    display:list-item;
-    list-style: square inside;
-    padding-left: 9%;
-    padding-top: 1%;
-    padding-bottom: 1%;
-    `,
-    it: `
-    font-style: italic;
-    `,
-    un: `
-    `,
-    snote: `
-    display:list-item;
-    list-style: circle inside;
-    `,
-    phrase: `
-    font-style: italic;
-    `,
-    usage: `
-    display:list-item;
-    list-style: circle inside;
-    `,
-    ure: `
-    display: inline-block;
-    padding-bottom: 1%;
-    font-weight: bold;
-    `,
-    dre: `
-    display: inline-block;
-    padding-top: 1%;
-    padding-bottom: 1%;
-    font-weight: bold;
-    `,
-    usageref: `
-    display: none;
-    `,
-    altpr: `
-    display: none;
-    `,
-    snotebox: `
-    display: none;
-    `,
-    art: `
-    display: none;
-    `,
-    dxnl: `
-    display: none;
-    `,
-    dx: `
-    display: none;
-    `,
-    dxt: `
-    font-style: italic;
-    `
-  }
+  const stylesheetUrl = browser.extension.getURL("stylesheet.css");
+  const linkElem = document.createElement('link');
+  linkElem.setAttribute('rel', 'stylesheet');
+  linkElem.setAttribute('href', stylesheetUrl);
+  document.getElementsByTagName('head')[0].appendChild(linkElem);
   
-  for (let className of Object.keys(css)) {
-    Array.from(popupDiv.getElementsByClassName(className)).forEach(
-      elem => elem.style = css[className]
-    ); 
-  }
-  
-  Array.from(popupDiv.getElementsByClassName('sound')).forEach( sound => {
+  Array.from(popupNode.getElementsByClassName('sound')).forEach( sound => {
     const audio = sound.firstChild;
     const audioElem = getAudio(audio);
     sound.after(audioElem);
@@ -255,14 +90,84 @@ function updatePopup(xmlDoc) {
   });
   
   const bookmarkButton = document.createElement('img');
-  bookmarkButton.src = browser.extension.getURL("images/star-empty-19.png");
+  bookmarkButton.src = browser.extension.getURL("images/logo.png");
   bookmarkButton.style.float = 'right';
   bookmarkButton.style.position = 'sticky';
   bookmarkButton.style.top = '0px';
+  bookmarkButton.style.width = '40px';
+
   const headword = xmlDoc.firstChild.firstChild.id.match(/[-\w\s]*/)[0];
   bookmarkButton.onclick = bookmarkToggle(headword, bookmarkButton);
-  popupDiv.prepend(bookmarkButton);
+  popupNode.prepend(bookmarkButton);
   
+}
+
+
+function arrangeSN(content) {
+  const sns = content.getElementsByClassName('sn');
+
+  for (let snElem of sns) {
+    if (snElem.innerHTML.trim().split(' ').length === 1) continue;
+
+    for (let sn of snElem.innerHTML.trim().split(' ')) {
+      const newSnElem = document.createElement('span');
+      newSnElem.className = 'sn';
+      newSnElem.innerHTML = sn;
+      snElem.before(newSnElem);
+    }
+
+    snElem.remove();
+  }
+
+
+  const subsenses = Array.from(sns).filter(item => {
+    return isNaN(parseInt(item.innerHTML));
+  });
+
+  for (let snElem of subsenses) {
+    const snBoxElem = document.createElement('span');
+    snBoxElem.className = 'snBox';
+    snElem.before(snBoxElem);
+    
+    const snContentElem = document.createElement('span');
+    snContentElem.className = 'snContent';
+    
+    let currentElem = snElem.nextElementSibling;
+    while (currentElem) {
+      if (currentElem.className === 'sn') break;
+      
+      let placeHolder = currentElem.nextElementSibling;
+      snContentElem.append(currentElem);
+      currentElem = placeHolder;
+    }
+    
+    snBoxElem.append(snElem);
+    snBoxElem.append(snContentElem);
+  }
+  
+  for (let snElem of sns) {
+    if (isNaN(parseInt(snElem.innerHTML))) continue;
+
+    const snBoxElem = document.createElement('span');
+    snBoxElem.className = 'snBox';
+    snElem.before(snBoxElem);
+    
+    const snContentElem = document.createElement('span');
+    snContentElem.className = 'snContent';
+    
+    let currentElem = snElem.nextElementSibling;
+    while (currentElem) {
+      if (currentElem.className === 'sn') break;
+      
+      let placeHolder = currentElem.nextElementSibling;
+      snContentElem.append(currentElem);
+      currentElem = placeHolder;
+    }
+    
+    snBoxElem.append(snElem);
+    snBoxElem.append(snContentElem);
+  }
+
 }
 
 
@@ -304,22 +209,22 @@ function showPopup(selection) {
   const anchorCoords = getAnchorCoords(selectionCoords);
   
   // Create popup
-  const popupDiv = document.createElement('div');
+  const popupNode = document.createElement('span');
 
-  popupDiv.className = 'wordiePopup';
-  popupDiv.style.background = '#d9f2e6';
-  popupDiv.style.border = "2px solid #8cd9b3";
-  popupDiv.style.borderRadius = "9px";
-  popupDiv.style.margin = "0px";
-  popupDiv.style.padding = "10px 16px";
-  popupDiv.style.height = '380px';
-  popupDiv.style.width = '360px';
-  popupDiv.style.boxShadow = "3px 5px 6px rgba(0, 0, 0, .1)";
-  popupDiv.style.textAlign = 'center';
-  popupDiv.style.lineHeight = 25;
-  popupDiv.style.fontFamily = 'Arial, Helvetica, sans-serif';
-  popupDiv.style.overflow = 'scroll';
-  popupDiv.innerHTML = 'Searching...'
+  popupNode.className = 'wordiePopup';
+  popupNode.style.background = '#eef0ff';
+  popupNode.style.border = "3px solid #D71920";
+  popupNode.style.borderRadius = "9px";
+  popupNode.style.margin = "0px";
+  popupNode.style.padding = "10px 16px";
+  popupNode.style.height = '380px';
+  popupNode.style.width = '360px';
+  popupNode.style.boxShadow = "3px 5px 6px rgba(0, 0, 0, .1)";
+  popupNode.style.textAlign = 'center';
+  popupNode.style.lineHeight = 25;
+  popupNode.style.fontFamily = 'Arial, Helvetica, sans-serif';
+  popupNode.style.overflow = 'scroll';
+  popupNode.innerHTML = 'Searching...'
 
   // Set popup position
   const offsetHeight = 404;
@@ -346,13 +251,13 @@ function showPopup(selection) {
     left = clientWidth - offsetWidth - 4;
   }
   
-  popupDiv.style.top = top + 'px';
-  popupDiv.style.left = left + 'px';
-  popupDiv.style.position = 'absolute';
-  popupDiv.style.zIndex = 16777270;
-  document.body.append(popupDiv);
+  popupNode.style.top = top + 'px';
+  popupNode.style.left = left + 'px';
+  popupNode.style.position = 'absolute';
+  popupNode.style.zIndex = 16777270;
+  document.body.append(popupNode);
 
-  return popupDiv;
+  return popupNode;
 
 }
 
@@ -374,9 +279,9 @@ function getAnchorCoords(selectionCoords) {
 
 
 function removePopup(event) {
-  const popupDivs = document.querySelectorAll('.wordiePopup');
-  for (popupDiv of popupDivs) {
-    if(popupDiv.contains(event.target)) return;
+  const popupNodes = document.querySelectorAll('.wordiePopup');
+  for (popupNode of popupNodes) {
+    if(popupNode.contains(event.target)) return;
   }
 
   document.querySelectorAll('.wordiePopup').forEach((elem) => {
@@ -388,14 +293,3 @@ function removePopup(event) {
 
 document.addEventListener("dblclick", createPopup);
 document.addEventListener("click", removePopup);
-
-
-
-// ~content
-// 	~createPopup
-//    ~sendInfo
-// 		~createDiv
-// 	  updatePopup
-//  
-// 	~removePopup (click)
-// 	saveEntry
