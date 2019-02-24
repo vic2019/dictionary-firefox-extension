@@ -1,46 +1,50 @@
 "user strict";
 
+document.addEventListener("dblclick", showPopup);
+document.addEventListener("click", removePopup);
 
-function createPopup() {
+
+function showPopup() {
   const selection = window.getSelection();
   if (selection.isCollapsed) return;
   
-  const popupNode = showPopup(selection);
+  sendRequest(selection);
+  
+}
+
+
+function sendRequest(selection) {
   
   const word = selection.toString().trim();
-  sendRequest(word); 
-
-}
-
-
-function sendRequest(word) {
   const KEY = '';
   const requestUrl = `https://www.dictionaryapi.com/api/v1/references/learners/xml/${word}?key=${KEY}`;
+
+  const wordInfo = getWordInfo(selection)
+  const popupNode = createPopup(wordInfo);
+  document.body.append(popupNode);
   
   const httpRequest = new XMLHttpRequest();
-  if (!httpRequest) updatePopup(false);
+  if (!httpRequest) notFound(popupNode);
   
-  httpRequest.onreadystatechange = handleResponse;
+  httpRequest.onload = function() {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(this.responseText, 'text/xml');
+    const content = buildDOM(xmlDoc.getElementsByTagName('entry_list')[0]);
+    
+    addFlexbox(content);
+    updateContent(content, popupNode);
+    // createBookmarkButton(selection);
+    
+    
+  }
+  
   httpRequest.open('GET', requestUrl);
-  httpRequest.send(); 
-
-}
-
-
-function handleResponse() {
-  if (this.readyState !== 4 || this.status !== 200) return;
-  // How to handle error?
-  
-  const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(this.responseText, 'text/xml');
-
-  //Need to check whether the word is available first
-  updatePopup(xmlDoc);
+  httpRequest.send();
   
 }
 
 
-function parseXmlObject(xmlNode) {
+function buildDOM(xmlNode) {
   const selfElem = document.createElement('span');
   selfElem.className = xmlNode.tagName;
   
@@ -50,7 +54,7 @@ function parseXmlObject(xmlNode) {
     if (child.nodeType === 3) {
       selfElem.append(child.nodeValue);
     } else if ( child.nodeType === 1) {
-      selfElem.append(parseXmlObject(child));
+      selfElem.append(buildDOM(child));
     }
   }
   
@@ -59,101 +63,70 @@ function parseXmlObject(xmlNode) {
 }
 
 
-function updatePopup(xmlDoc) {
-  const content = parseXmlObject(xmlDoc.getElementsByTagName('entry_list')[0]);
-
-  arrangeSN(content);
-
-  const popupNodes = document.body.getElementsByClassName('wordiePopup');
-  const popupNode = popupNodes[popupNodes.length - 1];
+function updateContent(content, popupNode) {
   popupNode.innerHTML = '';
   popupNode.style.textAlign = 'left';
-  popupNode.style.lineHeight = 1.15;
+  popupNode.style.lineHeight = 1.1;
+  popupNode.style.fontSize = '100%';
   popupNode.append(content);
   
-  const stylesheetUrl = browser.extension.getURL("stylesheet.css");
-  const linkElem = document.createElement('link');
-  linkElem.setAttribute('rel', 'stylesheet');
-  linkElem.setAttribute('href', stylesheetUrl);
-  document.getElementsByTagName('head')[0].appendChild(linkElem);
-  
   Array.from(popupNode.getElementsByClassName('sound')).forEach( sound => {
-    const audio = sound.firstChild;
-    const audioElem = getAudio(audio);
-    sound.after(audioElem);
+    const audioElem = getAudio(sound.firstChild);
+    sound.before(audioElem);
     
     const playButton = document.createElement('img');
     playButton.src = browser.extension.getURL("images/play_button.png");
+    playButton.style.maxWidth = '13px';
+    playButton.style.verticalAlign = 'text-top';
     playButton.onclick = () => audioElem.play();
-    // playButton.style.paddingLeft = '1%';
-    audioElem.after(playButton);
+    audioElem.before(playButton);
   });
   
-  const bookmarkButton = document.createElement('img');
-  bookmarkButton.src = browser.extension.getURL("images/logo.png");
-  bookmarkButton.style.float = 'right';
-  bookmarkButton.style.position = 'sticky';
-  bookmarkButton.style.top = '0px';
-  bookmarkButton.style.width = '40px';
+  // const bookmarkButton = document.createElement('img');
+  // bookmarkButton.src = browser.extension.getURL("images/logo.png");
+  // bookmarkButton.style.float = 'right';
+  // bookmarkButton.style.position = 'sticky';
+  // bookmarkButton.style.top = '0px';
+  // bookmarkButton.style.width = '40px';
 
-  const headword = xmlDoc.firstChild.firstChild.id.match(/[-\w\s]*/)[0];
-  bookmarkButton.onclick = bookmarkToggle(headword, bookmarkButton);
-  popupNode.prepend(bookmarkButton);
+  // const headword = xmlDoc.firstChild.firstChild.id.match(/[-\w\s]*/)[0];
+  // bookmarkButton.onclick = bookmarkToggle(headword, bookmarkButton);
+  // popupNode.prepend(bookmarkButton);
   
+  // Not sure why 'fl' must be renamed for it to display properly. Namespace conflict?
+  Array.from(content.getElementsByClassName('fl')).forEach(flElem => {
+    flElem.className = "flabel";
+  });
+
 }
 
 
-function arrangeSN(content) {
-  const sns = content.getElementsByClassName('sn');
+function addFlexbox(content) {
+  let sns = Array.from(content.getElementsByClassName('sn'));
 
-  for (let snElem of sns) {
-    if (snElem.innerHTML.trim().split(' ').length === 1) continue;
-
+  sns.forEach( snElem => {
+    if (snElem.innerHTML.trim().split(' ').length === 1) return;
+    
     for (let sn of snElem.innerHTML.trim().split(' ')) {
       const newSnElem = document.createElement('span');
       newSnElem.className = 'sn';
       newSnElem.innerHTML = sn;
       snElem.before(newSnElem);
     }
-
+  
     snElem.remove();
-  }
-
-
-  const subsenses = Array.from(sns).filter(item => {
-    return isNaN(parseInt(item.innerHTML));
+    sns = Array.from(content.getElementsByClassName('sn'));
   });
 
-  for (let snElem of subsenses) {
-    const snBoxElem = document.createElement('span');
-    snBoxElem.className = 'snBox';
-    snElem.before(snBoxElem);
-    
-    const snContentElem = document.createElement('span');
-    snContentElem.className = 'snContent';
-    
-    let currentElem = snElem.nextElementSibling;
-    while (currentElem) {
-      if (currentElem.className === 'sn') break;
-      
-      let placeHolder = currentElem.nextElementSibling;
-      snContentElem.append(currentElem);
-      currentElem = placeHolder;
-    }
-    
-    snBoxElem.append(snElem);
-    snBoxElem.append(snContentElem);
+  function isSubsense(snElem) {
+    return isNaN(parseInt(snElem.innerHTML));
   }
   
-  for (let snElem of sns) {
-    if (isNaN(parseInt(snElem.innerHTML))) continue;
-
+  function reformat(snElem) {
     const snBoxElem = document.createElement('span');
-    snBoxElem.className = 'snBox';
-    snElem.before(snBoxElem);
-    
+    snBoxElem.className = 'sn-box';
     const snContentElem = document.createElement('span');
-    snContentElem.className = 'snContent';
+    snContentElem.className = 'sn-content';
     
     let currentElem = snElem.nextElementSibling;
     while (currentElem) {
@@ -164,9 +137,12 @@ function arrangeSN(content) {
       currentElem = placeHolder;
     }
     
-    snBoxElem.append(snElem);
-    snBoxElem.append(snContentElem);
+    snElem.before(snBoxElem);
+    snBoxElem.append(snElem, snContentElem);
   }
+  
+  sns.filter(snElem => isSubsense(snElem)).forEach(snElem => reformat(snElem));
+  sns.filter(snElem => !isSubsense(snElem)).forEach(snElem => reformat(snElem));
 
 }
 
@@ -180,17 +156,17 @@ function bookmarkToggle(headword, bookmarkButton) {
 
 function getAudio(audio) {
   const fileName = audio.innerHTML;
-  let subdir = fileName.slice(0, 1);
+  let subDir = fileName.slice(0, 1);
 
   if (fileName.slice(0, 3) === 'bix') {
-    subdir = 'bix';
+    subDir = 'bix';
   } else if (fileName.slice(0, 2) === 'gg') {
-    subdir = 'gg';
+    subDir = 'gg';
   } else if (fileName.slice(0, 1).match(/\d/)) {
-    subdir = 'number';
+    subDir = 'number';
   }
 
-  const src = `https://media.merriam-webster.com/soundc11/${subdir}/${fileName}`;
+  const src =`https://media.merriam-webster.com/soundc11/${subDir}/${fileName}`;
   const audioElem = document.createElement('audio');
   audioElem.className = fileName;
   audioElem.src = src;
@@ -201,51 +177,51 @@ function getAudio(audio) {
 }
 
 
-
-
-function showPopup(selection) {
-  // Set anchor 
-  const selectionCoords = selection.getRangeAt(0).getBoundingClientRect();
-  const anchorCoords = getAnchorCoords(selectionCoords);
-  
-  // Create popup
-  const popupNode = document.createElement('span');
-
+function createPopup(wordInfo) {  
+  const popupNode = document.createElement('div');
   popupNode.className = 'wordiePopup';
+
+  // Create link to stylesheet
+  const stylesheetUrl = browser.extension.getURL("stylesheet.css");
+  const linkElem = document.createElement('link');
+  linkElem.setAttribute('rel', 'stylesheet');
+  linkElem.setAttribute('href', stylesheetUrl);
+  document.head.append(linkElem);
+
   popupNode.style.background = '#eef0ff';
-  popupNode.style.border = "3px solid #D71920";
-  popupNode.style.borderRadius = "9px";
-  popupNode.style.margin = "0px";
-  popupNode.style.padding = "10px 16px";
-  popupNode.style.height = '380px';
-  popupNode.style.width = '360px';
-  popupNode.style.boxShadow = "3px 5px 6px rgba(0, 0, 0, .1)";
-  popupNode.style.textAlign = 'center';
-  popupNode.style.lineHeight = 25;
+  popupNode.style.border = '3px solid #D71920';
+  popupNode.style.borderRadius = '9px';
+  popupNode.style.margin = '0px';
+  popupNode.style.padding = '10px 16px';
+  popupNode.style.height = '390px';
+  popupNode.style.width = '370px';
+  popupNode.style.boxShadow = '3px 4px 5px rgba(0, 0, 0, .3)';
   popupNode.style.fontFamily = 'Arial, Helvetica, sans-serif';
   popupNode.style.overflow = 'scroll';
-  popupNode.innerHTML = 'Searching...'
+  popupNode.style.textAlign = 'center';
+  popupNode.style.fontSize = '120%';
+  popupNode.style.lineHeight = 22;
+  popupNode.innerHTML = `Looking up the word "${wordInfo.word}"...`;
+
+  document.body.append(popupNode);
 
   // Set popup position
-  const offsetHeight = 404;
-  const offsetWidth = 396;
+  const offsetHeight = 414;
+  const offsetWidth = 406;
   const scrollHeight = document.documentElement.scrollHeight;
   const clientWidth = document.documentElement.clientWidth;
   
-  let top = anchorCoords.top - offsetHeight - 8;
-  let left = anchorCoords.left + 
-  (anchorCoords.right - anchorCoords.left - offsetWidth ) / 2;
+  let top = wordInfo.top - offsetHeight - 8;
+  let left = wordInfo.left + 
+  (wordInfo.right - wordInfo.left - offsetWidth ) / 2;
   
-  // alert(`top: ${top}, offsetWidth: ${offsetWidth}, pageYOffset: ${pageYOffset}, scrollHeight: ${scrollHeight}, anchor bottom: ${anchorCoords.bottom}`);
-  
-  if (top < pageYOffset && 
-    anchorCoords.bottom + offsetHeight + 8 < scrollHeight) {
-      top = anchorCoords.bottom + 8;
-    }
+  if (top < pageYOffset) {
+      top = wordInfo.bottom + 8;
+  }
     
-    if (left < pageXOffset + 4) {
-      left = pageXOffset + 4;
-    }
+  if (left < pageXOffset + 4) {
+    left = pageXOffset + 4;
+  }
     
     if (left > clientWidth - offsetWidth - 4) {
     left = clientWidth - offsetWidth - 4;
@@ -255,20 +231,21 @@ function showPopup(selection) {
   popupNode.style.left = left + 'px';
   popupNode.style.position = 'absolute';
   popupNode.style.zIndex = 16777270;
-  document.body.append(popupNode);
-
   return popupNode;
 
 }
 
 
-function getAnchorCoords(selectionCoords) {
+function getWordInfo(selection) {
+  const selectionCoords = selection.getRangeAt(0).getBoundingClientRect();
   const top = selectionCoords.top + pageYOffset;
   const bottom = top + selectionCoords.height;
   const left = selectionCoords.left + pageXOffset;
   const right = left + selectionCoords.width;
+  const word = selection.toString().trim().split(' ')[0];
 
   return {
+    word: word,
     top: top,
     bottom: bottom,
     left: left,
@@ -289,7 +266,3 @@ function removePopup(event) {
   });
 
 }
-
-
-document.addEventListener("dblclick", createPopup);
-document.addEventListener("click", removePopup);
