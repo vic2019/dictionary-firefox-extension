@@ -9,7 +9,7 @@ function showPopup() {
   if (selection.isCollapsed) return;
   
   sendRequest(selection);
-  
+
 }
 
 
@@ -28,14 +28,12 @@ function sendRequest(selection) {
   
   httpRequest.onload = function() {
     const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(this.responseText, 'text/xml');
+    const xmlDoc = parser.parseFromString(this.responseText, 'text/xml');;
     const content = buildDOM(xmlDoc.getElementsByTagName('entry_list')[0]);
     
     addFlexbox(content);
     updateContent(content, popupNode);
-    // createBookmarkButton(selection);
-    
-    
+    addBookmarkButton(selection, popupNode);    
   }
   
   httpRequest.open('GET', requestUrl);
@@ -70,6 +68,7 @@ function updateContent(content, popupNode) {
   popupNode.style.fontSize = '100%';
   popupNode.append(content);
   
+  // Add play buttons
   Array.from(popupNode.getElementsByClassName('sound')).forEach( sound => {
     const audioElem = getAudio(sound.firstChild);
     sound.before(audioElem);
@@ -77,21 +76,18 @@ function updateContent(content, popupNode) {
     const playButton = document.createElement('img');
     playButton.src = browser.extension.getURL("images/play_button.png");
     playButton.style.maxWidth = '13px';
-    playButton.style.verticalAlign = 'text-top';
     playButton.onclick = () => audioElem.play();
     audioElem.before(playButton);
   });
-  
-  // const bookmarkButton = document.createElement('img');
-  // bookmarkButton.src = browser.extension.getURL("images/logo.png");
-  // bookmarkButton.style.float = 'right';
-  // bookmarkButton.style.position = 'sticky';
-  // bookmarkButton.style.top = '0px';
-  // bookmarkButton.style.width = '40px';
 
-  // const headword = xmlDoc.firstChild.firstChild.id.match(/[-\w\s]*/)[0];
-  // bookmarkButton.onclick = bookmarkToggle(headword, bookmarkButton);
-  // popupNode.prepend(bookmarkButton);
+  // Add logo
+  const logo = document.createElement('img');
+  logo.src = browser.extension.getURL("images/logo.png");
+  logo.style.position = 'sticky';
+  logo.style.top = '0px';
+  logo.style.float = 'right';
+  logo.style.maxWidth = '40px';
+  popupNode.prepend(logo);
   
   // Not sure why 'fl' must be renamed for it to display properly. Namespace conflict?
   Array.from(content.getElementsByClassName('fl')).forEach(flElem => {
@@ -147,17 +143,10 @@ function addFlexbox(content) {
 }
 
 
-function bookmarkToggle(headword, bookmarkButton) {
-  return () => {
-    browser.runtime.sendMessage(headword);
-  }
-}
-
-
 function getAudio(audio) {
   const fileName = audio.innerHTML;
   let subDir = fileName.slice(0, 1);
-
+  
   if (fileName.slice(0, 3) === 'bix') {
     subDir = 'bix';
   } else if (fileName.slice(0, 2) === 'gg') {
@@ -165,14 +154,63 @@ function getAudio(audio) {
   } else if (fileName.slice(0, 1).match(/\d/)) {
     subDir = 'number';
   }
-
+  
   const src =`https://media.merriam-webster.com/soundc11/${subDir}/${fileName}`;
   const audioElem = document.createElement('audio');
   audioElem.className = fileName;
   audioElem.src = src;
   audioElem.display = 'none'; 
-
+  
   return audioElem;
+  
+}
+
+
+function addBookmarkButton(selection, popupNode) {
+  const rect = popupNode.getBoundingClientRect();
+  const word = selection.toString().trim().split(' ')[0];
+  
+  const bookmarkButton = document.createElement('img');
+  bookmarkButton.className = 'wordiePopup bookmarkButton';
+  bookmarkButton.style.position = 'absolute';
+  bookmarkButton.style.top = rect.bottom + pageYOffset - 30 + 'px';
+  bookmarkButton.style.left = rect.right + pageXOffset - 32 + 'px';
+  bookmarkButton.style.zIndex = 16777270;
+  bookmarkButton.style.maxWidth = '22px';
+
+  bookmarkButton.onclick = () => {
+    updateBookmark(word, 'toggle', bookmarkButton);
+  };
+  
+  updateBookmark(word, 'update', bookmarkButton);
+  popupNode.after(bookmarkButton);
+
+}
+
+
+function updateBookmark(word, action, bookmarkButton) {
+  const callBackground = browser.runtime.sendMessage({
+    word: word,
+    action: action,
+  });
+  callBackground.then( bookmarked => updateIcon(bookmarked, bookmarkButton) ); 
+  
+}
+
+
+
+function updateIcon(bookmarked, bookmarkButton) {
+  switch (Boolean(bookmarked)) {
+    case true:
+    bookmarkButton.src =browser.extension.getURL("images/star-filled-19.png");
+    break;
+    case false:
+    bookmarkButton.src =browser.extension.getURL("images/star-empty-19.png");
+    break;
+    default:
+    bookmarkButton.src =browser.extension.getURL("images/star-empty-19.png");
+    break;
+  }
 
 }
 
@@ -180,7 +218,7 @@ function getAudio(audio) {
 function createPopup(wordInfo) {  
   const popupNode = document.createElement('div');
   popupNode.className = 'wordiePopup';
-
+  
   // Create link to stylesheet
   const stylesheetUrl = browser.extension.getURL("stylesheet.css");
   const linkElem = document.createElement('link');
@@ -195,19 +233,18 @@ function createPopup(wordInfo) {
   popupNode.style.padding = '10px 16px';
   popupNode.style.height = '390px';
   popupNode.style.width = '370px';
-  popupNode.style.boxShadow = '3px 4px 5px rgba(0, 0, 0, .3)';
+  popupNode.style.boxShadow = '3px 4px 5px #b2b2b2';
   popupNode.style.fontFamily = 'Arial, Helvetica, sans-serif';
   popupNode.style.overflow = 'scroll';
+
   popupNode.style.textAlign = 'center';
   popupNode.style.fontSize = '120%';
   popupNode.style.lineHeight = 22;
   popupNode.innerHTML = `Looking up the word "${wordInfo.word}"...`;
 
-  document.body.append(popupNode);
-
   // Set popup position
-  const offsetHeight = 414;
-  const offsetWidth = 406;
+  const offsetHeight = 416;
+  const offsetWidth = 408;
   const scrollHeight = document.documentElement.scrollHeight;
   const clientWidth = document.documentElement.clientWidth;
   
@@ -230,7 +267,8 @@ function createPopup(wordInfo) {
   popupNode.style.top = top + 'px';
   popupNode.style.left = left + 'px';
   popupNode.style.position = 'absolute';
-  popupNode.style.zIndex = 16777270;
+  popupNode.style.zIndex = 16777268;
+
   return popupNode;
 
 }

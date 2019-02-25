@@ -1,51 +1,89 @@
 "use strict";
 
-function bookmarkToggle(headword) {
-  const url = `http://learnersdictionary.com/definition/${headword}`;
-  const folderTitle = "Saved Entries from Merriam-Webster's Learner's Dictionary";
-  
-  
-  const checkFolder = browser.bookmarks.search({title: folderTitle});
-  checkFolder.then( result => {
-    if (result.length > 0) {
-      for (let item of result) {
-        if (item.type === 'folder') {
-          browser.bookmarks.move(item.id, {index: 0});
-          return item;
-        };
-      }
-    }
-    
-    const createFolder = browser.bookmarks.create({
-      title: folderTitle,
-      type: 'folder'
+let dictFolder;
+const dictBookmarkIds = [];
+browser.runtime.onMessage.addListener(router);browser.bookmarks.onRemoved.addListener(handleRemoved);
+
+
+function handleRemoved(id, removeInfo) {
+  if (removeInfo.node.type === 'folder') dictFolder = undefined;
+}
+
+
+function router(message) {
+  switch(message.action) {
+    case 'update':
+    return new Promise( resolve => {
+      resolve(bookmarkStatus(message))
     });
-  })
-  .then( folder => {
-    if (!folder) return;
+    case 'toggle':
+    return new Promise( resolve => {
+      resolve(bookmarkToggle(message));
+    });
+    default:
+    break;
+  }
+  
+}
+
+
+function bookmarkStatus(message) {
+  const url = `http://learnersdictionary.com/definition/${message.word.toLowerCase()}`;
+  const folderTitle = "Merriam-Webster's Learner's Dictionary - Saved Entries";
+  if (!dictFolder) {
+    const checkFolder = browser.bookmarks.search({title: folderTitle});
+    
+    return checkFolder.then( result => {
+      if (result.length > 0) {
+        for (let item of result) {
+          if (item.type === 'folder') {
+            dictFolder = item;
+            return item;
+          }
+        }
+      }
+      
+      const createFolder = browser.bookmarks.create({
+        title: folderTitle,
+        type: 'folder'
+      });
+      createFolder.then( folder => {
+        dictFolder = folder;
+      });     
+    }).then( checkBookmark );    
+  } else {    
+    return new Promise( resolve => {
+      resolve(checkBookmark(dictFolder));
+    });
+  }
+  
+
+  function checkBookmark(folder) {
+    if (!folder) return false;
     
     const searchBookmark = browser.bookmarks.search({url: url});
-    searchBookmark.then( bookmarks => {
+    return searchBookmark.then( bookmarks => {
       if (bookmarks.length > 0) {
         for (let item of bookmarks) {
-          if (item.parentId === folder.id) return;
-        }
-      };
-
-      browser.bookmarks.create({
-        title: headword,
-        url: url,
-        type: 'bookmark'
-      })
-      .then( bookmark => {
-        browser.bookmarks.move(bookmark.id, {parentId: folder.id});
-      });
-    });
-    
-  });
+          if (item.parentId === folder.id) return item.id;
+        }    
+      }
+      
+      return false;
+    });  
+  }
 
 }
 
 
-browser.runtime.onMessage.addListener(bookmarkToggle);
+function bookmarkToggle(message) {
 
+// browser.bookmarks.create({
+//   title: message.word,
+//   url: url,
+//   type: 'bookmark'
+// })
+// .then( bookmark => {
+//   browser.bookmarks.move(bookmark.id, {parentId: folder.id});
+// });
+}

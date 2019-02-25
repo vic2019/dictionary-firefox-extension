@@ -1,4 +1,4 @@
-.wordiePopup {
+.wordiePopup:not(.bookmarkButton) {
   background: #eef0ff;
   border: 3px solid #D71920;
   border-radius: 9px;
@@ -49,16 +49,15 @@
 }
 
 .wordiePopup .pr::before, .altpr::before {
-  content: "/ ";
+  content: "/";
 }
 
 .wordiePopup .pr::after, .altpr::after {
-  content: " /";
+  content: "/";
 }
 
 .wordiePopup .flabel {
  color: #747474;
- margin-left: 1%;
  font-weight: bold;
  font-style: italic;
 }
@@ -215,7 +214,7 @@
 }
 
 .wordiePopup .ct {
-  font-style: italic;
+  text-transform: uppercase;
 }
 
 .wordiePopup .tag {
@@ -225,9 +224,11 @@
 .wordiePopup .pr, .altpr {
   margin-left: 1%;
   color: #747474;
+  margin-right: 1%;
 }
 
 .wordiePopup .lb {
+  display: block;
   font-style: italic;
 }
 
