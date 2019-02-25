@@ -169,6 +169,7 @@ function getAudio(audio) {
 function addBookmarkButton(selection, popupNode) {
   const rect = popupNode.getBoundingClientRect();
   const word = selection.toString().trim().split(' ')[0];
+  const url = `http://learnersdictionary.com/definition/${word.toLowerCase()}`;
   
   const bookmarkButton = document.createElement('img');
   bookmarkButton.className = 'wordiePopup bookmarkButton';
@@ -179,28 +180,31 @@ function addBookmarkButton(selection, popupNode) {
   bookmarkButton.style.maxWidth = '22px';
 
   bookmarkButton.onclick = () => {
-    updateBookmark(word, 'toggle', bookmarkButton);
+    updateBookmark(word, url, 'toggle', bookmarkButton);
   };
   
-  updateBookmark(word, 'update', bookmarkButton);
+  updateBookmark(word, url, 'update', bookmarkButton);
   popupNode.after(bookmarkButton);
 
 }
 
 
-function updateBookmark(word, action, bookmarkButton) {
+function updateBookmark(word, url, action, bookmarkButton) {
   const callBackground = browser.runtime.sendMessage({
     word: word,
+    url: url,
     action: action,
   });
-  callBackground.then( bookmarked => updateIcon(bookmarked, bookmarkButton) ); 
+  callBackground.then( bookmarked => {
+    updateIcon(Boolean(bookmarked), bookmarkButton);
+  }); 
   
 }
 
 
 
 function updateIcon(bookmarked, bookmarkButton) {
-  switch (Boolean(bookmarked)) {
+  switch (bookmarked) {
     case true:
     bookmarkButton.src =browser.extension.getURL("images/star-filled-19.png");
     break;

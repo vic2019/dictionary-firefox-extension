@@ -1,7 +1,7 @@
 "use strict";
 
 let dictFolder;
-const dictBookmarkIds = [];
+const currentBookmarkList = [];
 browser.runtime.onMessage.addListener(router);browser.bookmarks.onRemoved.addListener(handleRemoved);
 
 
@@ -11,24 +11,25 @@ function handleRemoved(id, removeInfo) {
 
 
 function router(message) {
-  switch(message.action) {
+
+  switch (message.action) {
     case 'update':
-    return new Promise( resolve => {
-      resolve(bookmarkStatus(message))
-    });
+      return new Promise( resolve => {
+        resolve(bookmarkStatus(message));
+      });
+      break;
     case 'toggle':
-    return new Promise( resolve => {
-      resolve(bookmarkToggle(message));
-    });
+      return new Promise( resolve => {
+        resolve(bookmarkToggle(message));
+      });
+      break;
     default:
-    break;
   }
   
 }
 
 
 function bookmarkStatus(message) {
-  const url = `http://learnersdictionary.com/definition/${message.word.toLowerCase()}`;
   const folderTitle = "Merriam-Webster's Learner's Dictionary - Saved Entries";
   if (!dictFolder) {
     const checkFolder = browser.bookmarks.search({title: folderTitle});
@@ -57,18 +58,17 @@ function bookmarkStatus(message) {
     });
   }
   
-
   function checkBookmark(folder) {
     if (!folder) return false;
     
-    const searchBookmark = browser.bookmarks.search({url: url});
+    const searchBookmark = browser.bookmarks.search({url: message.url});
     return searchBookmark.then( bookmarks => {
       if (bookmarks.length > 0) {
         for (let item of bookmarks) {
           if (item.parentId === folder.id) return item.id;
         }    
       }
-      
+
       return false;
     });  
   }
@@ -77,13 +77,21 @@ function bookmarkStatus(message) {
 
 
 function bookmarkToggle(message) {
+  const getId = bookmarkStatus(message);
+  return getId.then( id => {
+    if (!id) {
+      return browser.bookmarks.create({
+        title: message.word,
+        url: message.url,
+        type: 'bookmark'
+      }).then( bookmark => {
+        browser.bookmarks.move(bookmark.id, {parentId: dictFolder.id});
+        return bookmark.id;
+      });    
 
-// browser.bookmarks.create({
-//   title: message.word,
-//   url: url,
-//   type: 'bookmark'
-// })
-// .then( bookmark => {
-//   browser.bookmarks.move(bookmark.id, {parentId: folder.id});
-// });
+    } else {
+      return browser.bookmarks.remove(id).then( () => false );
+    }
+  });
+
 }
