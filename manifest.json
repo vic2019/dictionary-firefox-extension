@@ -21,7 +21,6 @@
   "permissions": [
     "*://www.dictionaryapi.com/api/v1/references/learners/xml/*",
     "https://media.merriam-webster.com/soundc11/*",
-    "bookmarks",
-    "tabs"
+    "bookmarks"
   ]
 }

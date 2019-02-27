@@ -173,6 +173,7 @@ function addBookmarkButton(selection, popupNode) {
   
   const bookmarkButton = document.createElement('img');
   bookmarkButton.className = 'wordiePopup bookmarkButton';
+  bookmarkButton.alt = 'Save';
   bookmarkButton.style.position = 'absolute';
   bookmarkButton.style.top = rect.bottom + pageYOffset - 30 + 'px';
   bookmarkButton.style.left = rect.right + pageXOffset - 32 + 'px';

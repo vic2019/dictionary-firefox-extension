@@ -1,5 +1,5 @@
 .wordiePopup:not(.bookmarkButton) {
-  background: #eef0ff;
+  background: #cce5ff;
   border: 3px solid #D71920;
   border-radius: 9px;
   margin: 0px;
@@ -9,10 +9,12 @@
   box-shadow: 3px 4px 5px rgba(0, 0, 0, .3);
   font-family: Arial, Helvetica, sans-serif;
   overflow: scroll;
+  font-size: 100%;
 }
 
 .wordiePopup span {
   margin-bottom: 1%;
+  font-size: 1em;
 }
 
 .wordiePopup .sn-box {
@@ -101,11 +103,11 @@
 }
 
 .wordiePopup .wsgram::before, .sgram::before, .gram::before {
-  content: "[ ";
+  content: "[";
 }
 
 .wordiePopup .wsgram::after, .sgram::after, .gram::after {
-  content: " ]";
+  content: "]";
 }
 
 .wordiePopup .sn {
@@ -144,7 +146,7 @@
 
 }
 
-.wordiePopup .dxt {
+.wordiePopup .dxt, .sx {
   text-transform: uppercase;
 }
 
