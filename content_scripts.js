@@ -191,13 +191,13 @@ function addBookmarkButton(selection, popupNode) {
 
 
 function updateBookmark(word, url, action, bookmarkButton) {
-  const callBackground = browser.runtime.sendMessage({
+  const messageBackground = browser.runtime.sendMessage({
     word: word,
     url: url,
     action: action,
   });
-  callBackground.then( bookmarked => {
-    updateIcon(Boolean(bookmarked), bookmarkButton);
+  messageBackground.then( bookmarked => {
+    updateIcon(bookmarked, bookmarkButton);
   }); 
   
 }
