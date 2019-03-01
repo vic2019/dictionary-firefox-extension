@@ -1,17 +1,20 @@
 "use strict";
 
-let extFolder;
+let extFolder = undefined;
 browser.runtime.onMessage.addListener(handleMessage);browser.bookmarks.onRemoved.addListener(handleRemoved);
 
 
-function handleRemoved(id, removeInfo) {
-  if (removeInfo.node.type === 'folder') extFolder = undefined;
+function handleRemoved(id) {
+  browser.storage.local.get('extFolder').then(retrieved => {
+    if (retrieved.extFolder && (retrieved.extFolder.id === id) ) {
+      extFolder = undefined;
+      browser.storage.local.remove('extFolder');
+    }
+  });
 }
 
 
 function handleMessage(message) {
-  extFolder = undefined;
-  console.log(`extFolder: ${extFolder}`);
   if (extFolder) {
     return getBookmark(extFolder).then(performAction);
   } else {
@@ -19,21 +22,21 @@ function handleMessage(message) {
   }
 
   function getFolder() {
-    return browser.storage.local.get('extFolder').then( folder => {
-      console.log(`Stored folder id: ${folder.id}`);
-      if (folder.id) {
-        extFolder = folder;
-        return folder;
+    return browser.storage.local.get('extFolder').then( retrieved => {
+      if (retrieved.extFolder) {
+        extFolder = retrieved.extFolder;
+        return retrieved.extFolder;
 
       } else {
         const folderTitle = "Merriam-Webster's Learner's Dictionary - Saved Entries";
-            
+      
         return browser.bookmarks.create({
           title: folderTitle,
           type: 'folder'
         }).then( folder => {
-          browser.storage.local.set({extfolder: folder})
           extFolder = folder;
+          browser.storage.local.set({extFolder: folder});
+          });
           return folder;
         });
       }

@@ -5,7 +5,7 @@
 
   "browser_specific_settings": {
     "gecko": {
-      "id": "dictionary@notarealaddress.com",
+      "id": "dictionary@notarealaddress.org",
       "strict_min_version": "42.0"
     }
   },
