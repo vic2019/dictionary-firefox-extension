@@ -4,7 +4,9 @@ let extFolder = undefined;
 browser.runtime.onMessage.addListener(handleMessage);browser.bookmarks.onRemoved.addListener(handleRemoved);
 
 
-function handleRemoved(id) {
+function handleRemoved(id, removeInfo) {
+  if (removeInfo.node.type !== 'folder') return;
+  
   browser.storage.local.get('extFolder').then(retrieved => {
     if (retrieved.extFolder && (retrieved.extFolder.id === id) ) {
       extFolder = undefined;
@@ -36,7 +38,7 @@ function handleMessage(message) {
         }).then( folder => {
           extFolder = folder;
           browser.storage.local.set({extFolder: folder});
-          });
+      
           return folder;
         });
       }
