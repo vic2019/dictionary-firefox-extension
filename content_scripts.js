@@ -24,18 +24,37 @@ function sendRequest(selection) {
   document.body.append(popupNode);
   
   const httpRequest = new XMLHttpRequest();
-  if (!httpRequest) notFound(popupNode);
+  if (!httpRequest) {
+    notFoundPage(selection, popupNode);
+    return;
+  }
   
   httpRequest.onload = function() {
     const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(this.responseText, 'text/xml');;
-    const content = buildDOM(xmlDoc.getElementsByTagName('entry_list')[0]);
+    const xmlDoc = parser.parseFromString(this.responseText, 'text/xml');
+    const entryListNode = xmlDoc.getElementsByTagName('entry_list')[0];
+
+    if (!entryListNode) {
+      notFoundPage(selection, popupNode);
+      return;
+    }
     
+    const content = buildDOM(entryListNode);
+    
+    if (content.firstElementChild.className === 'suggestion') {
+      const heading = document.createElement('p');
+      heading.innerHTML = 'Did you mean to search for\u2014'
+      content.prepend(heading);
+    }
+
     addFlexbox(content);
     updateContent(content, popupNode);
-    addBookmarkButton(selection, popupNode);    
+    addButtons(selection, popupNode);
+    popupNode.append(linkGoogle(selection)); 
+    addLinks(popupNode);
   }
-  
+
+  httpRequest.timeout = 6000;
   httpRequest.open('GET', requestUrl);
   httpRequest.send();
   
@@ -74,32 +93,24 @@ function updateContent(content, popupNode) {
     sound.before(audioElem);
     
     const playButton = document.createElement('img');
+    playButton.className = 'playButton';
     playButton.src = browser.extension.getURL("images/play_button.png");
     playButton.style.maxWidth = '13px';
     playButton.onclick = () => audioElem.play();
     audioElem.before(playButton);
   });
 
-  // Add logo
-  const logo = document.createElement('img');
-  logo.src = browser.extension.getURL("images/logo.png");
-  logo.style.position = 'sticky';
-  logo.style.top = '0px';
-  logo.style.float = 'right';
-  logo.style.maxWidth = '40px';
-  popupNode.prepend(logo);
-  
   // Not sure why 'fl' must be renamed for it to display properly. Namespace conflict?
   Array.from(content.getElementsByClassName('fl')).forEach(flElem => {
     flElem.className = "flabel";
   });
-
+  
 }
 
 
 function addFlexbox(content) {
   let sns = Array.from(content.getElementsByClassName('sn'));
-
+  
   sns.forEach( snElem => {
     if (snElem.innerHTML.trim().split(' ').length === 1) return;
     
@@ -109,11 +120,11 @@ function addFlexbox(content) {
       newSnElem.innerHTML = sn;
       snElem.before(newSnElem);
     }
-  
+    
     snElem.remove();
     sns = Array.from(content.getElementsByClassName('sn'));
   });
-
+  
   function isSubsense(snElem) {
     return isNaN(parseInt(snElem.innerHTML));
   }
@@ -135,11 +146,12 @@ function addFlexbox(content) {
     
     snElem.before(snBoxElem);
     snBoxElem.append(snElem, snContentElem);
+
   }
   
   sns.filter(snElem => isSubsense(snElem)).forEach(snElem => reformat(snElem));
   sns.filter(snElem => !isSubsense(snElem)).forEach(snElem => reformat(snElem));
-
+  
 }
 
 
@@ -166,27 +178,43 @@ function getAudio(audio) {
 }
 
 
-function addBookmarkButton(selection, popupNode) {
+function addButtons(selection, popupNode) {
   const rect = popupNode.getBoundingClientRect();
   const word = selection.toString().trim().split(' ')[0];
-  const url = `http://learnersdictionary.com/definition/${word.toLowerCase()}`;
   
+  // Add logo
+  const logoUrl = `http://learnersdictionary.com/definition/${selection.toString()}`;
+  const logo = document.createElement('img');
+  logo.className = 'wordiePopup logo';
+  logo.src = browser.extension.getURL("images/logo.png");
+  logo.style = 'position: absolute; z-index: 16777270; max-width: 40px;';
+  logo.style.top = rect.top + pageYOffset + 5 + 'px';
+  logo.style.left = rect.right + pageXOffset - 81 + 'px';
+  logo.onclick = () => {
+    browser.runtime.sendMessage({
+      url: logoUrl,
+      action: 'openTab'
+    })
+  };
+  
+  popupNode.after(logo);
+  
+  
+  // Add bookmark button
+  const bookmarkUrl = `http://learnersdictionary.com/definition/${word.toLowerCase()}`;
   const bookmarkButton = document.createElement('img');
   bookmarkButton.className = 'wordiePopup bookmarkButton';
   bookmarkButton.alt = 'Save';
-  bookmarkButton.style.position = 'absolute';
+  bookmarkButton.style = 'position: absolute; z-index: 16777270; max-width: 22px;';
   bookmarkButton.style.top = rect.bottom + pageYOffset - 30 + 'px';
   bookmarkButton.style.left = rect.right + pageXOffset - 32 + 'px';
-  bookmarkButton.style.zIndex = 16777270;
-  bookmarkButton.style.maxWidth = '22px';
-
   bookmarkButton.onclick = () => {
-    updateBookmark(word, url, 'toggle', bookmarkButton);
+    updateBookmark(word, bookmarkUrl, 'toggle', bookmarkButton);
   };
   
-  updateBookmark(word, url, 'update', bookmarkButton);
+  updateBookmark(word, bookmarkUrl, 'update', bookmarkButton);
   popupNode.after(bookmarkButton);
-
+  
 }
 
 
@@ -272,10 +300,51 @@ function createPopup(wordInfo) {
   popupNode.style.top = top + 'px';
   popupNode.style.left = left + 'px';
   popupNode.style.position = 'absolute';
-  popupNode.style.zIndex = 16777268;
+  popupNode.style.zIndex = 16777270;
 
   return popupNode;
 
+}
+
+
+function notFoundPage(selection, popupNode) {
+  popupNode.innerHTML = `No results found. `;
+  popupNode.append(linkGoogle(selection));
+}
+
+
+function linkGoogle(selection) {
+  const word = selection.toString().trim().split(' ').join('+');
+  const googleUrl = `https://www.google.com/search?q=${word}+definition`;
+  const googleLink = document.createElement('span');
+  googleLink.className = 'openInTab';
+  googleLink.innerHTML = 'Search on Google?';
+  googleLink.onclick = () => {
+    browser.runtime.sendMessage({
+      url: googleUrl,
+      action: 'openTab'
+    })
+  };
+
+  return googleLink;
+  
+}
+
+
+function addLinks(popupNode) {
+  const linkElems = popupNode.querySelectorAll('.wordiPopup .dxt, .ct, .suggestion');
+  
+  for (let elem of linkElems) {
+    let word = elem.innerHTML.trim().split(' ')[0];
+    let url = `http://learnersdictionary.com/definition/${word}`
+    elem.className += ' openInTab';
+    elem.onclick = () => {
+      browser.runtime.sendMessage({
+        url: url,
+        action: 'openTab'
+      })
+    };
+  }
 }
 
 

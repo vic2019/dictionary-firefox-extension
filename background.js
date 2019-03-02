@@ -1,7 +1,18 @@
 "use strict";
 
 let extFolder = undefined;
-browser.runtime.onMessage.addListener(handleMessage);browser.bookmarks.onRemoved.addListener(handleRemoved);
+browser.runtime.onMessage.addListener(router);browser.bookmarks.onRemoved.addListener(handleRemoved);
+
+
+function router(message) {
+  switch (message.action) {
+    case 'update':
+    case 'toggle':
+      return handleBookmarkAction(message);
+    case 'openTab':
+      return openTab(message);
+  }
+}
 
 
 function handleRemoved(id, removeInfo) {
@@ -16,7 +27,7 @@ function handleRemoved(id, removeInfo) {
 }
 
 
-function handleMessage(message) {
+function handleBookmarkAction(message) {
   if (extFolder) {
     return getBookmark(extFolder).then(performAction);
   } else {
@@ -87,3 +98,6 @@ function handleMessage(message) {
 }
 
 
+function openTab(message) {
+    browser.tabs.create({active: false, url: message.url});
+}

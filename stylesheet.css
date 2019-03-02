@@ -1,4 +1,4 @@
-.wordiePopup:not(.bookmarkButton) {
+.wordiePopup:not(.logo, .bookmarkButton) {
   background: #cce5ff;
   border: 3px solid #D71920;
   border-radius: 9px;
@@ -146,7 +146,7 @@
 
 }
 
-.wordiePopup .dxt, .sx {
+.wordiePopup .dxt, .sx, .ct {
   text-transform: uppercase;
 }
 
@@ -215,10 +215,6 @@
   display: block;
 }
 
-.wordiePopup .ct {
-  text-transform: uppercase;
-}
-
 .wordiePopup .tag {
   font-style: italic;
 }
@@ -242,6 +238,17 @@
   display: none;
 }
 
+.wordiePopup .suggestion {
+  display: block;
+}
+
+.bookmarkButton:hover, .logo:hover, .playButton:hover, .openInTab:hover {
+  cursor: pointer;
+}
+
+.wordiePopup .openInTab {
+  color: blue;
+}
 
 
 
