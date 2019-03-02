@@ -1,4 +1,4 @@
-.wordiePopup:not(.logo, .bookmarkButton) {
+.wordiePopup:not(.dictLogo, .bookmarkButton) {
   background: #cce5ff;
   border: 3px solid #D71920;
   border-radius: 9px;
@@ -242,14 +242,14 @@
   display: block;
 }
 
-.bookmarkButton:hover, .logo:hover, .playButton:hover, .openInTab:hover {
+.bookmarkButton:hover, .dictLogo:hover, .playButton:hover, .openInTab:hover {
   cursor: pointer;
+  font-weight: bold;
 }
 
 .wordiePopup .openInTab {
   color: blue;
 }
-
 
 
 

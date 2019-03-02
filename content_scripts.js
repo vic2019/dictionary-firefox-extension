@@ -54,7 +54,7 @@ function sendRequest(selection) {
     addLinks(popupNode);
   }
 
-  httpRequest.timeout = 6000;
+  httpRequest.timeout = 7000;
   httpRequest.open('GET', requestUrl);
   httpRequest.send();
   
@@ -94,6 +94,7 @@ function updateContent(content, popupNode) {
     
     const playButton = document.createElement('img');
     playButton.className = 'playButton';
+    playButton.title = 'Hear the pronunciation!';
     playButton.src = browser.extension.getURL("images/play_button.png");
     playButton.style.maxWidth = '13px';
     playButton.onclick = () => audioElem.play();
@@ -182,28 +183,29 @@ function addButtons(selection, popupNode) {
   const rect = popupNode.getBoundingClientRect();
   const word = selection.toString().trim().split(' ')[0];
   
-  // Add logo
-  const logoUrl = `http://learnersdictionary.com/definition/${selection.toString()}`;
-  const logo = document.createElement('img');
-  logo.className = 'wordiePopup logo';
-  logo.src = browser.extension.getURL("images/logo.png");
-  logo.style = 'position: absolute; z-index: 16777270; max-width: 40px;';
-  logo.style.top = rect.top + pageYOffset + 5 + 'px';
-  logo.style.left = rect.right + pageXOffset - 81 + 'px';
-  logo.onclick = () => {
+  // Add dictLogo
+  const dictLogoUrl = `http://learnersdictionary.com/definition/${selection.toString()}`;
+  const dictLogo = document.createElement('img');
+  dictLogo.className = 'wordiePopup dictLogo';
+  dictLogo.title = 'See this entry at the Merriam-Webster website!';
+  dictLogo.src = browser.extension.getURL("images/logo.png");
+  dictLogo.style = 'position: sticky; float: right; top: 0; z-index: 16777270; max-width: 45px;';
+
+  dictLogo.onclick = () => {
     browser.runtime.sendMessage({
-      url: logoUrl,
+      url: dictLogoUrl,
       action: 'openTab'
     })
   };
   
-  popupNode.after(logo);
+  popupNode.prepend(dictLogo);
   
   
   // Add bookmark button
   const bookmarkUrl = `http://learnersdictionary.com/definition/${word.toLowerCase()}`;
   const bookmarkButton = document.createElement('img');
   bookmarkButton.className = 'wordiePopup bookmarkButton';
+  bookmarkButton.title = 'Bookmark this entry!';
   bookmarkButton.alt = 'Save';
   bookmarkButton.style = 'position: absolute; z-index: 16777270; max-width: 22px;';
   bookmarkButton.style.top = rect.bottom + pageYOffset - 30 + 'px';
