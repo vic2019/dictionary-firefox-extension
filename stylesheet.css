@@ -1,5 +1,5 @@
-.wordiePopup:not(.dictLogo, .bookmarkButton) {
-  background: #cce5ff;
+.wordiePopup {
+  background: #eef0ff;
   border: 3px solid #D71920;
   border-radius: 9px;
   margin: 0px;
@@ -7,29 +7,20 @@
   height: 390px;
   width: 370px;
   box-shadow: 3px 4px 5px rgba(0, 0, 0, .3);
-  font-family: Arial, Helvetica, sans-serif;
   overflow: scroll;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 100%;
-}
-
-.wordiePopup span {
-  margin-bottom: 1px;
-  font-size: 1em;
+  line-height: 1.3;
 }
 
 .wordiePopup .sn-box {
   display: flex;
   flex-flow: row;
-  margin-bottom: 1px;
 }
 
 .wordiePopup .sn-content {
   display: flex;
   flex-flow: column;
-}
-
-.wordiePopup .sn-content > span {
-  margin-bottom: 1px;
 }
 
 .wordiePopup .sn {
@@ -42,8 +33,8 @@
 
 .wordiePopup .hw {
  display: inline-block;
- margin-top: 2px;
- margin-bottom: 2px;
+ margin-top: 3px;
+ margin-bottom: 3px;
  margin-right: 1px;
  font-size: 145%; 
  font-weight: bold;
@@ -89,7 +80,6 @@
 .wordiePopup .wsgram {
  display: block;
  color: #747474;
- margin-top: 1px;
 }
 
 .wordiePopup .sgram {
@@ -99,7 +89,6 @@
 .wordiePopup .gram {
  display: block;
  color: #747474;
- margin-top: 1px;
 }
 
 .wordiePopup .wsgram::before, .sgram::before, .gram::before {
@@ -112,23 +101,20 @@
 
 .wordiePopup .sn {
  font-weight: bold;
- margin-right: 1px;
+ margin-right: 2px;
 }
 
 .wordiePopup .vi {
   display:list-item;
   list-style: square inside;
-  margin-top: 2px;
-  margin-left: 33px;
+  margin: 1px 0px 1px 33px;
 }
 
 .wordiePopup .exampleButton {
   display: list-item;
   list-style: none;
-  color: #0000ee;
-  margin-top: 2px;
-  margin-bottom: 2px;
-  margin-left: 33px;
+  color: #0000e4;
+  margin: 1px 0px 1px 33px;
 }
 
 .wordiePopup .vt {
@@ -152,7 +138,11 @@
 }
 
 .wordiePopup .dxnl {
+  
+}
 
+.wordiePopup .dxt::after {
+  content: ';';
 }
 
 .wordiePopup .dxt, .sx, .ct {
@@ -188,7 +178,7 @@
 }
 
 .wordiePopup .dro {
-  margin-bottom: 1px;
+
 }
 
 .wordiePopup .dre {
@@ -196,7 +186,7 @@
   font-weight: bold;
 }
 
-.wordiePopup .pva {
+.wordiePopup .pva, .va {
   font-weight: bold;
 }
 
@@ -257,7 +247,7 @@
 }
 
 .wordiePopup .openInTab {
-  color: #0000ee;
+  color: #0000e4;
 }
 
 
