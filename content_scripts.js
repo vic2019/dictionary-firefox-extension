@@ -48,6 +48,7 @@ function sendRequest(selection) {
     }
 
     addFlexbox(content);
+    addViToggle(content);
     updateContent(content, popupNode);
     addButtons(selection, popupNode);
     popupNode.append(linkGoogle(selection)); 
@@ -112,8 +113,8 @@ function updateContent(content, popupNode) {
 function addFlexbox(content) {
   let sns = Array.from(content.getElementsByClassName('sn'));
   
-  sns.forEach( snElem => {
-    if (snElem.innerHTML.trim().split(' ').length === 1) return;
+  for (let snElem of sns) {
+    if (snElem.innerHTML.trim().split(' ').length === 1) continue;
     
     for (let sn of snElem.innerHTML.trim().split(' ')) {
       const newSnElem = document.createElement('span');
@@ -124,7 +125,7 @@ function addFlexbox(content) {
     
     snElem.remove();
     sns = Array.from(content.getElementsByClassName('sn'));
-  });
+  }
   
   function isSubsense(snElem) {
     return isNaN(parseInt(snElem.innerHTML));
@@ -153,6 +154,48 @@ function addFlexbox(content) {
   sns.filter(snElem => isSubsense(snElem)).forEach(snElem => reformat(snElem));
   sns.filter(snElem => !isSubsense(snElem)).forEach(snElem => reformat(snElem));
   
+}
+
+
+function addViToggle(content) {
+  const vis = content.getElementsByClassName('vi');
+  
+  let index = 0;
+  for (let vi of vis) {
+    const ps = vi.previousElementSibling;
+    const pps = ps? ps.previousElementSibling: null;
+    const ppps = pps? pps.previousElementSibling: null;
+
+    if (ps && pps && ppps && ps.className.includes('vi') &&
+        pps.className.includes('vi') &&
+        ppps.className.includes('vi')) {
+      vi.className += ` hiddenExample${index}`;
+      vi.style.display = 'none';
+      
+      if (vi.nextElementSibling === null || 
+        !vi.nextElementSibling.className.includes('vi')) {
+        const viToggle = document.createElement('span');
+        viToggle.className = 'exampleButton';
+        viToggle.innerHTML = '[+] more examples';
+        let hidden = false;
+        const selector = `hiddenExample${index}`;
+        const toHide = content.getElementsByClassName(selector);
+
+        viToggle.onclick = () => {
+          for (let item of toHide) {
+            item.style.display = hidden? 'none': 'list-item';
+          }
+
+          viToggle.innerHTML = hidden? '[+] more examples': '[-] hide examples';
+          hidden = hidden? false: true;
+        };
+
+        vi.after(viToggle);
+        index += 1;
+      }
+    }
+  }
+
 }
 
 
@@ -189,7 +232,9 @@ function addButtons(selection, popupNode) {
   dictLogo.className = 'wordiePopup dictLogo';
   dictLogo.title = 'See this entry at the Merriam-Webster website!';
   dictLogo.src = browser.extension.getURL("images/logo.png");
-  dictLogo.style = 'position: sticky; float: right; top: 0; z-index: 16777270; max-width: 45px;';
+  dictLogo.style = 'position: absolute; z-index: 16777270; width: 43px;';
+  dictLogo.style.top = rect.top + pageYOffset + 8 + 'px';
+  dictLogo.style.left = rect.right + pageXOffset - 54 + 'px';
 
   dictLogo.onclick = () => {
     browser.runtime.sendMessage({
@@ -198,7 +243,7 @@ function addButtons(selection, popupNode) {
     })
   };
   
-  popupNode.prepend(dictLogo);
+  popupNode.after(dictLogo);
   
   
   // Add bookmark button
@@ -334,7 +379,7 @@ function linkGoogle(selection) {
 
 
 function addLinks(popupNode) {
-  const linkElems = popupNode.querySelectorAll('.wordiPopup .dxt, .ct, .suggestion');
+  const linkElems = popupNode.querySelectorAll('.wordiePopup .dxt, .sx, .ct, .suggestion');
   
   for (let elem of linkElems) {
     let word = elem.innerHTML.trim().split(' ')[0];
