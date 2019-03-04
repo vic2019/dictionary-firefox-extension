@@ -1,39 +1,43 @@
 "user strict";
 
-document.addEventListener("dblclick", showPopup);
+document.addEventListener("dblclick", sendRequest);
 document.addEventListener("click", removePopup);
 
 
-function showPopup() {
+function sendRequest() {
   const selection = window.getSelection();
   if (selection.isCollapsed) return;
   
-  sendRequest(selection);
-
-}
-
-
-function sendRequest(selection) {
-  
-  const word = selection.toString().trim();
-  const KEY = '82d19a2e-151a-40be-bf7d-451a70a065a3';
-  const requestUrl = `https://www.dictionaryapi.com/api/v1/references/learners/xml/${word}?key=${KEY}`;
-
   const wordInfo = getWordInfo(selection)
   const popupNode = createPopup(wordInfo);
-  document.body.append(popupNode);
-  
+  const shadowHost = document.createElement('span');
+  shadowHost.className = 'dictionaryShadowHost';
+  const shadowRoot = shadowHost.attachShadow({mode:'open'});
+  shadowRoot.append(popupNode);
+  shadowRoot.append(getStylesheet());
+  document.body.append(shadowHost);
+
+  const word = selection.toString().trim();
+  const KEY = '';
+  const requestUrl = `https://www.dictionaryapi.com/api/v1/references/learners/xml/${word}?key=${KEY}`;
+
   const httpRequest = new XMLHttpRequest();
   if (!httpRequest) {
     notFoundPage(selection, popupNode);
     return;
   }
   
-  httpRequest.onload = function() {
+  httpRequest.onload = handleResponse;
+  httpRequest.timeout = 7000;
+  httpRequest.open('GET', requestUrl);
+  httpRequest.send();
+  
+  function handleResponse() {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(this.responseText, 'text/xml');
     const entryListNode = xmlDoc.getElementsByTagName('entry_list')[0];
 
+    // If response is a string of error message..
     if (!entryListNode) {
       notFoundPage(selection, popupNode);
       return;
@@ -41,6 +45,7 @@ function sendRequest(selection) {
     
     const content = buildDOM(entryListNode);
     
+    // If response is a list of suggestions..
     if (content.firstElementChild.className === 'suggestion') {
       const heading = document.createElement('p');
       heading.innerHTML = 'Did you mean to search for\u2014'
@@ -51,24 +56,24 @@ function sendRequest(selection) {
     updateContent(selection, content, popupNode);
   }
   
-  httpRequest.timeout = 7000;
-  httpRequest.open('GET', requestUrl);
-  httpRequest.send();
+}
+
+
+function getStylesheet() {
+  const url = browser.extension.getURL("stylesheet.css");
+  const linkElem = document.createElement('link');
+  linkElem.setAttribute('rel', 'stylesheet');
+  linkElem.setAttribute('href', url);
   
+  return linkElem;
+
 }
 
 
 function createPopup(wordInfo) {  
   const popupNode = document.createElement('div');
-  popupNode.className = 'wordiePopup';
+  popupNode.className = 'popupNode';
   popupNode.innerHTML = `<p style='font-size:125%; text-align:center;'>Looking up the word "${wordInfo.word}"...</p>`;
-  
-  // Create link to stylesheet
-  const stylesheetUrl = browser.extension.getURL("stylesheet.css");
-  const linkElem = document.createElement('link');
-  linkElem.setAttribute('rel', 'stylesheet');
-  linkElem.setAttribute('href', stylesheetUrl);
-  document.head.append(linkElem);
 
 
   // Set popup position
@@ -104,6 +109,7 @@ function createPopup(wordInfo) {
 
 
 function buildDOM(xmlNode) {
+  // Recursively create html tree based on the response xml doc
   const selfElem = document.createElement('span');
   selfElem.className = xmlNode.tagName;
   
@@ -123,15 +129,11 @@ function buildDOM(xmlNode) {
 
 
 function updateContent(selection, content, popupNode) {
-  // Change fl to flabel to avoid name comflict
-  const fls = content.getElementsByClassName('fl');
-  for (let fl of fls) fl.className = 'flabel';
-  
-  formatSns(content);
+  formatSns(content); // Adding .sn-box and .sn-content for styling purposes
   popupNode.innerHTML = '';
   popupNode.append(content);
   
-  addViToggle(content);
+  addViToggle(content); // Adding the show/hide feature for example sentences
   addButtons(selection, popupNode);
   popupNode.append(linkGoogle(selection)); 
   addLinks(popupNode);
@@ -140,8 +142,9 @@ function updateContent(selection, content, popupNode) {
 
 
 function formatSns(content) {
-  let sns = content.getElementsByClassName('sn');
+  let sns = content.querySelectorAll('.sn');
   
+  // Splitting one 'sn' into two 'sn's if the sn contains multiple values separated by space 
   for (let snElem of sns) {
     if (snElem.innerHTML.trim().split(' ').length === 1) continue;
     
@@ -155,7 +158,7 @@ function formatSns(content) {
     snElem.remove();
   }
 
-  sns = Array.from(sns);
+  sns = Array.from(content.getElementsByClassName('sn'));
   
   function isSubsense(snElem) {
     return isNaN(parseInt(snElem.innerHTML));
@@ -180,7 +183,17 @@ function formatSns(content) {
     snBoxElem.append(snElem, snContentElem);
     
   }
-  
+
+  // Change the organization from this:
+  //     -sn
+  //     -sn
+  //     -stuff
+  // To this:
+  //     -sn-box 
+  //         -sn 
+  //         -sn-content
+  //             -stuff
+
   sns.filter(snElem => isSubsense(snElem)).forEach(snElem => reformat(snElem));
   sns.filter(snElem => !isSubsense(snElem)).forEach(snElem => reformat(snElem));
   
@@ -200,7 +213,7 @@ function addViToggle(content) {
   pps.className.includes('vi') &&
   ppps.className.includes('vi')) {
     vi.className += ` hiddenExample${index}`;
-    vi.style.display = 'none';
+    vi.style.display = 'none'; // Show only the first three examples ('vi')
     
     if (vi.nextElementSibling === null || 
       !vi.nextElementSibling.className.includes('vi')) {
@@ -322,16 +335,10 @@ function updateBookmark(word, url, action, bookmarkButton) {
 
 
 function updateIcon(bookmarked, bookmarkButton) {
-  switch (bookmarked) {
-    case true:
+  if (bookmarked) {
     bookmarkButton.src =browser.extension.getURL("images/star-filled-19.png");
-    break;
-    case false:
+  } else {
     bookmarkButton.src =browser.extension.getURL("images/star-empty-19.png");
-    break;
-    default:
-    bookmarkButton.src =browser.extension.getURL("images/star-empty-19.png");
-    break;
   }
 
 }
@@ -356,7 +363,7 @@ function linkGoogle(selection) {
 
 
 function addLinks(popupNode) {
-  const linkElems = popupNode.querySelectorAll('.wordiePopup .dxt, .sx, .ct, .suggestion');
+  const linkElems = popupNode.querySelectorAll('.dxt, .sx, .ct, .suggestion');
   
   for (let elem of linkElems) {
     let word = elem.innerHTML.trim();
@@ -373,7 +380,7 @@ function addLinks(popupNode) {
 
 
 function notFoundPage(selection, popupNode) {
-  popupNode.innerHTML = `No results found. `;
+  popupNode.innerHTML = 'No results found. ';
   popupNode.append(linkGoogle(selection));
 }
 
@@ -398,11 +405,14 @@ function getWordInfo(selection) {
 
 
 function removePopup(event) {
-  const popupNodes = document.querySelectorAll('.wordiePopup, .dictLogo, .bookmarkButton');
-  for (popupNode of popupNodes) {
-    if(popupNode.contains(event.target)) return;
+  let shadowHosts = document.getElementsByClassName('dictionaryShadowHost');
+  for (shadowHost of shadowHosts) {  
+    if(shadowHost.contains(event.target)) return;
   }
-
-  popupNodes.forEach(elem => elem.remove());
+  
+  shadowHosts = document.querySelectorAll('.dictionaryShadowHost');
+  for (shadowHost of shadowHosts) {
+    shadowHost.remove();
+  }
 
 }

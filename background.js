@@ -16,6 +16,8 @@ function router(message) {
 
 
 function handleRemoved(id, removeInfo) {
+  // When a bookmark is removed, check if the removed bookmark is the extension's folder. If so, reset extFolder.
+
   if (removeInfo.node.type !== 'folder') return;
   
   browser.storage.local.get('extFolder').then(retrieved => {
@@ -28,6 +30,8 @@ function handleRemoved(id, removeInfo) {
 
 
 function handleBookmarkAction(message) {
+  // When a popup is created for the first time during a session, set extFolder to the extension folder (or create a folder if none exists). Then, check whether the bookmark exists inside the extension folder. 
+
   if (extFolder) {
     return getBookmark(extFolder).then(performAction);
   } else {
