@@ -107,14 +107,14 @@
 .wordiePopup .vi {
   display:list-item;
   list-style: square inside;
-  margin: 1px 0px 1px 33px;
+  margin: 2px 0px 1px 33px;
 }
 
 .wordiePopup .exampleButton {
   display: list-item;
   list-style: none;
   color: #0000e4;
-  margin: 1px 0px 1px 33px;
+  margin: 2px 0px 4px 33px;
 }
 
 .wordiePopup .vt {
@@ -131,6 +131,10 @@
 
 .wordiePopup .un::before {
   content: "\2014" " ";
+}
+
+.wordiePopup .dx {
+  display: block;
 }
 
 .wordiePopup .dx::before {

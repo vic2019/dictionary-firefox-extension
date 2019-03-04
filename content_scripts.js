@@ -16,7 +16,7 @@ function showPopup() {
 function sendRequest(selection) {
   
   const word = selection.toString().trim();
-  const KEY = '';
+  const KEY = '82d19a2e-151a-40be-bf7d-451a70a065a3';
   const requestUrl = `https://www.dictionaryapi.com/api/v1/references/learners/xml/${word}?key=${KEY}`;
 
   const wordInfo = getWordInfo(selection)
@@ -45,6 +45,7 @@ function sendRequest(selection) {
       const heading = document.createElement('p');
       heading.innerHTML = 'Did you mean to search for\u2014'
       content.prepend(heading);
+      content.append(document.createElement('br'));
     }
 
     updateContent(selection, content, popupNode);
@@ -60,7 +61,7 @@ function sendRequest(selection) {
 function createPopup(wordInfo) {  
   const popupNode = document.createElement('div');
   popupNode.className = 'wordiePopup';
-  popupNode.innerHTML = `<p style='font-size:130%'>Looking up the word "${wordInfo.word}"...</p>`;
+  popupNode.innerHTML = `<p style='font-size:125%; text-align:center;'>Looking up the word "${wordInfo.word}"...</p>`;
   
   // Create link to stylesheet
   const stylesheetUrl = browser.extension.getURL("stylesheet.css");
