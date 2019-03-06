@@ -125,6 +125,10 @@
   font-style: italic;
 }
 
+.un {
+  display: block;
+}
+
 .un::before {
   content: "\2014" " ";
 }

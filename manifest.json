@@ -13,6 +13,10 @@
       "js": ["content-scripts.js"]  
   }],
 
+  "options_ui": {
+    "page": "options.html"
+  },
+
   "web_accessible_resources": [
     "images/*",
     "stylesheet.css"
@@ -21,6 +25,7 @@
   "permissions": [
     "*://www.dictionaryapi.com/api/v1/references/learners/xml/*",
     "bookmarks",
-    "storage"
+    "storage",
+    "menus"
   ]
 }

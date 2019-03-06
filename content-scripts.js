@@ -3,6 +3,26 @@
 document.addEventListener("dblclick", sendRequest);
 document.addEventListener("click", removePopup);
 
+let KEY;
+browser.storage.local.get('key').then( result => {
+  KEY = result.key;
+});
+
+
+// Update the API key
+browser.storage.onChanged.addListener( changes => {
+  const key = changes.key;
+  if (!key) return;
+  if (key.oldValue !== key.newValue) {
+    KEY = key.newValue;
+  }
+});
+
+
+browser.runtime.onMessage.addListener( () => {
+  sendRequest();
+});
+
 
 function sendRequest() {
   const selection = window.getSelection();
@@ -18,7 +38,6 @@ function sendRequest() {
   document.body.append(shadowHost);
 
   const word = selection.toString().trim();
-  const KEY = '';
   const requestUrl = `https://www.dictionaryapi.com/api/v1/references/learners/xml/${word}?key=${KEY}`;
 
   const httpRequest = new XMLHttpRequest();
@@ -28,9 +47,9 @@ function sendRequest() {
   }
   
   httpRequest.onload = handleResponse;
-  httpRequest.timeout = 7000;
   httpRequest.open('GET', requestUrl);
   httpRequest.send();
+  
   
   function handleResponse() {
     const parser = new DOMParser();
@@ -73,7 +92,7 @@ function getStylesheet() {
 function createPopup(wordInfo) {  
   const popupNode = document.createElement('div');
   popupNode.className = 'popupNode';
-  popupNode.innerHTML = `<p style='font-size:125%; text-align:center;'>Looking up the word "${wordInfo.word}"...</p>`;
+  popupNode.innerHTML = `<p style='font-size:125%; text-align:center;'><Br>Looking up the word "${wordInfo.word}"...</p>`;
 
 
   // Set popup position
@@ -366,7 +385,7 @@ function addLinks(popupNode) {
   const linkElems = popupNode.querySelectorAll('.dxt, .sx, .ct, .suggestion');
   
   for (let elem of linkElems) {
-    let word = elem.innerHTML.trim();
+    let word = elem.innerHTML.match(/[/-\w\s\d]*/)[0];
     let url = `http://learnersdictionary.com/definition/${word}`
     elem.className += ' openInTab';
     elem.onclick = () => {
@@ -380,8 +399,9 @@ function addLinks(popupNode) {
 
 
 function notFoundPage(selection, popupNode) {
-  popupNode.innerHTML = 'No results found. ';
+  popupNode.innerHTML = '<Br>No results found. ';
   popupNode.append(linkGoogle(selection));
+  popupNode.innerHTML += '<Br><Br>(Also, please make sure you have a valid API key.)';
 }
 
 

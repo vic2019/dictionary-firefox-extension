@@ -4,6 +4,21 @@ let extFolder = undefined;
 browser.runtime.onMessage.addListener(router);browser.bookmarks.onRemoved.addListener(handleRemoved);
 
 
+browser.menus.create({
+  id: "Merriam-Webster dictionary extension",
+  title: "Look up in dictionary",
+  contexts: ["selection"]
+});
+
+
+// Allows user to launch dictionary with context menu button
+browser.menus.onClicked.addListener( (info, tab) => {
+  if (info.menuItemId == "Merriam-Webster dictionary extension") {
+    browser.tabs.sendMessage(tab.id, {});
+  }
+});
+
+
 function router(message) {
   switch (message.action) {
     case 'update':
