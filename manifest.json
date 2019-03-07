@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "Wordie",
+  "name": "Merriam-Webster's Learner's Dictionary (third-party extension)",
   "version": "1.0.0",
 
   "background": {

@@ -92,7 +92,7 @@ function getStylesheet() {
 function createPopup(wordInfo) {  
   const popupNode = document.createElement('div');
   popupNode.className = 'popupNode';
-  popupNode.innerHTML = `<p style='font-size:125%; text-align:center;'><Br>Looking up the word "${wordInfo.word}"...</p>`;
+  popupNode.innerHTML = `<Br><p style='font-size:120%; text-align:center;'>Looking up the word "${wordInfo.word}"...</p>`;
 
 
   // Set popup position
@@ -203,7 +203,7 @@ function formatSns(content) {
     
   }
 
-  // Change the organization from this:
+  // Changes the organization from this:
   //     -sn
   //     -sn
   //     -stuff
@@ -308,9 +308,9 @@ function addButtons(selection, popupNode) {
   dictLogo.className = 'dictLogo';
   dictLogo.title = 'See this entry at the Merriam-Webster website!';
   dictLogo.src = browser.extension.getURL("images/logo.png");
-  dictLogo.style = 'position: absolute; z-index: 16777270; width: 43px;';
-  dictLogo.style.top = rect.top + pageYOffset + 8 + 'px';
-  dictLogo.style.left = rect.right + pageXOffset - 54 + 'px';
+  dictLogo.style = 'position: absolute; z-index: 16777270; width: 50px;';
+  dictLogo.style.top = rect.top + pageYOffset + 9 + 'px';
+  dictLogo.style.left = rect.right + pageXOffset - 63 + 'px';
   
   dictLogo.onclick = () => {
     browser.runtime.sendMessage({
@@ -399,9 +399,11 @@ function addLinks(popupNode) {
 
 
 function notFoundPage(selection, popupNode) {
-  popupNode.innerHTML = '<Br>No results found. ';
+  popupNode.style.fontSize = '125%';
+  popupNode.style.textAlign = 'center';
+  popupNode.innerHTML = "<Br><p>No results found (or invalid API key).</p>";
   popupNode.append(linkGoogle(selection));
-  popupNode.innerHTML += '<Br><Br>(Also, please make sure you have a valid API key.)';
+  
 }
 
 
