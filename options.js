@@ -1,4 +1,8 @@
-document.querySelector('form').addEventListener('submit', saveKey);
+document.querySelector('#setKey').addEventListener('click', saveKey);
+document.querySelector('#default').addEventListener('click', () => {
+  browser.storage.local.set({key: undefined});
+  alert('Demo key saved!');
+});
 
 function saveKey(event) {
   const key = document.getElementById('api-key').value.trim();
@@ -11,6 +15,6 @@ function saveKey(event) {
   browser.storage.local.set({
     key: key
   });
-  event.preventDefault();
+  // event.preventDefault();
 
 }

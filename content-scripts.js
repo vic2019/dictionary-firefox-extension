@@ -38,16 +38,19 @@ function sendRequest() {
   document.body.append(shadowHost);
 
   const word = selection.toString().trim();
-  const requestUrl = `https://www.dictionaryapi.com/api/v1/references/learners/xml/${word}?key=${KEY}`;
+  let url;
 
-  const httpRequest = new XMLHttpRequest();
-  if (!httpRequest) {
-    notFoundPage(selection, popupNode);
-    return;
+  if (KEY === undefined) { 
+    url = `https://3rx9tdzpxi.execute-api.us-west-1.amazonaws.com/default/getDictionary/?word=${word}`;
+  } else {
+    url = `https://www.dictionaryapi.com/api/v1/references/learners/xml/${word}?key=${KEY}`;
   }
-  
+
+  const encodedUrl = encodeURI(url);
+
+  const httpRequest = new XMLHttpRequest(); 
   httpRequest.onload = handleResponse;
-  httpRequest.open('GET', requestUrl);
+  httpRequest.open('GET', encodedUrl);
   httpRequest.send();
   
   
@@ -301,7 +304,7 @@ function addButtons(selection, popupNode) {
   
   // Add logo and link to Merriam-Webster site
   const rect = popupNode.getBoundingClientRect();
-  const word = selection.toString().trim().split(' ')[0];
+  const word = selection.toString().trim();
 
   const dictLogoUrl = `http://learnersdictionary.com/definition/${selection.toString()}`;
   const dictLogo = document.createElement('img');
@@ -323,7 +326,7 @@ function addButtons(selection, popupNode) {
   
   
   // Add bookmark button
-  const bookmarkUrl = `http://learnersdictionary.com/definition/${word.toLowerCase()}`;
+  const bookmarkUrl = encodeURI(`http://learnersdictionary.com/definition/${word.toLowerCase()}`);
   const bookmarkButton = document.createElement('img');
   bookmarkButton.className = 'bookmarkButton';
   bookmarkButton.title = 'Bookmark this entry!';
@@ -413,7 +416,7 @@ function getWordInfo(selection) {
   const bottom = top + selectionCoords.height;
   const left = selectionCoords.left + pageXOffset;
   const right = left + selectionCoords.width;
-  const word = selection.toString().trim().split(' ')[0];
+  const word = selection.toString().trim();
 
   return {
     word: word,

@@ -37,7 +37,8 @@
   ],
 
   "permissions": [
-    "https://www.dictionaryapi.com/api/v1/references/learners/xml/*",
+    "https://www.dictionaryapi.com/api/v1/references/learners/xml/",
+    "https://3rx9tdzpxi.execute-api.us-west-1.amazonaws.com/default/getDictionary",
     "bookmarks",
     "storage",
     "menus"
