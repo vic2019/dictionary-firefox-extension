@@ -4,10 +4,12 @@ let extFolder = undefined;
 browser.runtime.onMessage.addListener(router);browser.bookmarks.onRemoved.addListener(handleRemoved);
 
 
-browser.menus.create({
-  id: "Merriam-Webster dictionary extension",
-  title: "Look up in dictionary",
-  contexts: ["selection"]
+browser.menus.removeAll().then( () => {
+  browser.menus.create({
+    id: "Merriam-Webster dictionary extension",
+    title: "Look up in dictionary",
+    contexts: ["selection"]
+  });
 });
 
 
