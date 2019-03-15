@@ -53,14 +53,18 @@
   content: "/";
 }
 
+.in, .def, .un, .dx, .uro, .sin, .cx, .suggestion {
+ display: block;
+}
+
+.it, .phrase, .sl, .ssl, .slb, .tag, .usageref {
+  font-style: italic;
+}
+
 .fl {
  color: #747474;
  font-weight: bold;
  font-style: italic;
-}
-
-.in {
- display: block;
 }
 
 .if {
@@ -77,21 +81,12 @@
   font-style: italic;
 }
 
-.def {
- display: block;
-}
-
-.wsgram {
+.wsgram, .gram {
  display: block;
  color: #747474;
 }
 
 .sgram {
- color: #747474;
-}
-
-.gram {
- display: block;
  color: #747474;
 }
 
@@ -124,20 +119,8 @@
   font-weight: bold;  
 }
 
-.it {
-  font-style: italic;
-}
-
-.un {
-  display: block;
-}
-
 .un::before {
   content: "\2014" " ";
-}
-
-.dx {
-  display: block;
 }
 
 .dx::before {
@@ -150,14 +133,6 @@
 
 .dxt, .sx, .ct {
   text-transform: uppercase;
-}
-
-.phrase {
-  font-style: italic;
-}
-
-.uro {
-  display: block;
 }
 
 .ure {
@@ -178,32 +153,8 @@
   font-weight: bold;
 }
 
-.sl {
-  font-style: italic;
-}
-
 .hsl {
   color: #747474;
-}
-
-.ssl {
-  font-style: italic;
-}
-
-.sin {
-  display: block;
-}
-
-.slb {
-  font-style: italic;
-}
-
-.cx {
-  display: block;
-}
-
-.tag {
-  font-style: italic;
 }
 
 .pr, .altpr {
@@ -217,16 +168,8 @@
   font-style: italic;
 }
 
-.usageref {
-  font-style: italic;
-}
-
 .sound, .art {
   display: none;
-}
-
-.suggestion {
-  display: block;
 }
 
 .bookmarkButton:hover, .dictLogo:hover, .playButton:hover, .openInTab:hover, .exampleButton:hover {
