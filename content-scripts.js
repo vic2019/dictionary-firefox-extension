@@ -169,9 +169,10 @@ function formatSns(content) {
   
   // Splitting one 'sn' into two 'sn's if the sn contains multiple values separated by space 
   for (let snElem of sns) {
-    if (snElem.innerHTML.trim().split(' ').length === 1) continue;
+    const snParts = snElem.innerHTML.trim().split(' ');
+    if (snParts.length === 1) continue;
     
-    for (let sn of snElem.innerHTML.trim().split(' ')) {
+    for (let sn of snParts) {
       const newSnElem = document.createElement('span');
       newSnElem.className = 'sn';
       newSnElem.innerHTML = sn;
@@ -181,8 +182,23 @@ function formatSns(content) {
     snElem.remove();
   }
 
-  sns = Array.from(content.getElementsByClassName('sn'));
+
+  // Changes the organization from this:
+  //     -sn
+  //     -sn
+  //     -stuff
+  //
+  // To this:
+  //     -sn-box 
+  //         -sn 
+  //         -sn-content
+  //             -stuff
   
+  sns = Array.from(content.getElementsByClassName('sn'));
+  sns.filter(snElem => isSubsense(snElem)).forEach(snElem => reformat(snElem));
+  sns.filter(snElem => !isSubsense(snElem)).forEach(snElem => reformat(snElem));
+  
+
   function isSubsense(snElem) {
     return isNaN(parseInt(snElem.innerHTML));
   }
@@ -203,23 +219,8 @@ function formatSns(content) {
     }
     
     snElem.before(snBoxElem);
-    snBoxElem.append(snElem, snContentElem);
-    
+    snBoxElem.append(snElem, snContentElem);  
   }
-
-  // Changes the organization from this:
-  //     -sn
-  //     -sn
-  //     -stuff
-  //
-  // To this:
-  //     -sn-box 
-  //         -sn 
-  //         -sn-content
-  //             -stuff
-
-  sns.filter(snElem => isSubsense(snElem)).forEach(snElem => reformat(snElem));
-  sns.filter(snElem => !isSubsense(snElem)).forEach(snElem => reformat(snElem));
   
 }
 
@@ -233,32 +234,32 @@ function addViToggle(content) {
     const pps = ps? ps.previousElementSibling: null;
     const ppps = pps? pps.previousElementSibling: null;
     
-  if (ps && pps && ppps && ps.className.includes('vi') &&
-  pps.className.includes('vi') &&
-  ppps.className.includes('vi')) {
-    vi.className += ` hiddenExample${index}`;
-    vi.style.display = 'none'; // Show only the first three examples ('vi')
-    
-    if (vi.nextElementSibling === null || 
-      !vi.nextElementSibling.className.includes('vi')) {
-        const viToggle = document.createElement('span');
-        viToggle.className = 'exampleButton';
-        viToggle.innerHTML = '[+] more examples';
-        let hidden = false;
-        const selector = `hiddenExample${index}`;
-        const toHide = content.getElementsByClassName(selector);
-        
-        viToggle.onclick = () => {
-          for (let item of toHide) {
-            item.style.display = hidden? 'none': 'list-item';
-          }
+    if (ps && pps && ppps && ps.className.includes('vi') &&
+    pps.className.includes('vi') &&
+    ppps.className.includes('vi')) {
+      vi.className += ` hiddenExample${index}`;
+      vi.style.display = 'none'; // Show only the first three examples ('vi')
+      
+      if (vi.nextElementSibling === null || 
+        !vi.nextElementSibling.className.includes('vi')) {
+          const viToggle = document.createElement('span');
+          viToggle.className = 'exampleButton';
+          viToggle.innerHTML = '[+] more examples';
+          let hidden = false;
+          const selector = `hiddenExample${index}`;
+          const toHide = content.getElementsByClassName(selector);
           
-          viToggle.innerHTML = hidden? '[+] more examples': '[-] hide examples';
-          hidden = hidden? false: true;
-        };
-        
-        vi.after(viToggle);
-        index += 1;
+          viToggle.onclick = () => {
+            for (let item of toHide) {
+              item.style.display = hidden? 'none': 'list-item';
+            }
+            
+            viToggle.innerHTML = hidden? '[+] more examples': '[-] hide examples';
+            hidden = hidden? false: true;
+          };
+          
+          vi.after(viToggle);
+          index += 1;
       }
     }
   }
