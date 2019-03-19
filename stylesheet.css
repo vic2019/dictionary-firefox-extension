@@ -31,10 +31,6 @@
   margin-right: 3px;
 }
 
-.entry {
-  display: block;
-}
-
 .hw {
  display: inline-block;
  margin-top: 3px;
@@ -45,6 +41,22 @@
  vertical-align: baseline;
 }
 
+.entry, .in, .def, .un, .dx, .uro, .dre, .sin, .cx, .wsgram, .gram, .suggestion, .lb {
+  display: block;
+}
+
+.fl, .it, .il, .phrase, .sl, .ssl, .slb, .tag, .usageref, .lb {
+  font-style: italic;
+}
+
+.fl, .if, .ure, .dre, .pva, .va {
+  font-weight: bold;
+}
+
+.fl, .if, .il, .wsgram, .gram, .sgram, .hsl {
+  color: #747474;
+}
+
 .pr::before, .altpr::before {
   content: "/";
 }
@@ -53,41 +65,8 @@
   content: "/";
 }
 
-.in, .def, .un, .dx, .uro, .sin, .cx, .suggestion {
- display: block;
-}
-
-.it, .phrase, .sl, .ssl, .slb, .tag, .usageref {
-  font-style: italic;
-}
-
-.fl {
- color: #747474;
- font-weight: bold;
- font-style: italic;
-}
-
-.if {
-  color: #747474;
-  font-weight: bold;
-}
-
 .if::after {
   content: ";"
-}
-
-.il { 
-  color: #747474;
-  font-style: italic;
-}
-
-.wsgram, .gram {
- display: block;
- color: #747474;
-}
-
-.sgram {
- color: #747474;
 }
 
 .wsgram::before, .sgram::before, .gram::before {
@@ -135,37 +114,14 @@
   text-transform: uppercase;
 }
 
-.ure {
-  font-weight: bold;
-}
-
 .ure::before {
   content: "\2014" " ";
-}
-
-
-.dre {
-  display: block;
-  font-weight: bold;
-}
-
-.pva, .va {
-  font-weight: bold;
-}
-
-.hsl {
-  color: #747474;
 }
 
 .pr, .altpr {
   color: #747474;
   margin-left: 1px;
   margin-right: 1px;
-}
-
-.lb {
-  display: block;
-  font-style: italic;
 }
 
 .sound, .art {

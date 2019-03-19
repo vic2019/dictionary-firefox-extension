@@ -40,6 +40,7 @@ function sendRequest() {
   const word = selection.toString().trim();
   let url;
 
+  // Use a proxy if no key is given
   if (KEY === undefined) { 
     url = `https://3rx9tdzpxi.execute-api.us-west-1.amazonaws.com/default/getDictionary/?word=${word}`;
   } else {
@@ -210,6 +211,7 @@ function formatSns(content) {
   //     -sn
   //     -sn
   //     -stuff
+  //
   // To this:
   //     -sn-box 
   //         -sn 
