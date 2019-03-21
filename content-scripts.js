@@ -83,7 +83,7 @@ function sendRequest() {
 
 
 function getStylesheet() {
-  const url = browser.extension.getURL("stylesheet.css");
+  const url = browser.runtime.getURL("stylesheet.css");
   const linkElem = document.createElement('link');
   linkElem.setAttribute('rel', 'stylesheet');
   linkElem.setAttribute('href', url);
@@ -276,7 +276,7 @@ function addButtons(selection, popupNode) {
     const playButton = document.createElement('img');
     playButton.className = 'playButton';
     playButton.title = 'Hear the pronunciation!';
-    playButton.src = browser.extension.getURL("images/play_button.png");
+    playButton.src = browser.runtime.getURL("images/play_button.png");
     playButton.style.maxWidth = '12px';
     playButton.onclick = () => audioElem.play();
     audioElem.before(playButton);
@@ -313,7 +313,7 @@ function addButtons(selection, popupNode) {
   const dictLogo = document.createElement('img');
   dictLogo.className = 'dictLogo';
   dictLogo.title = 'See this entry at the Merriam-Webster website!';
-  dictLogo.src = browser.extension.getURL("images/logo.png");
+  dictLogo.src = browser.runtime.getURL("images/logo.png");
   dictLogo.style = 'position: absolute; z-index: 16777270; width: 50px;';
   dictLogo.style.top = rect.top + pageYOffset + 9 + 'px';
   dictLogo.style.left = rect.right + pageXOffset - 63 + 'px';
@@ -361,9 +361,9 @@ function updateBookmark(word, url, action, bookmarkButton) {
 
 function updateIcon(bookmarked, bookmarkButton) {
   if (bookmarked) {
-    bookmarkButton.src =browser.extension.getURL("images/star-filled-19.png");
+    bookmarkButton.src =browser.runtime.getURL("images/star-filled-19.png");
   } else {
-    bookmarkButton.src =browser.extension.getURL("images/star-empty-19.png");
+    bookmarkButton.src =browser.runtime.getURL("images/star-empty-19.png");
   }
 
 }
