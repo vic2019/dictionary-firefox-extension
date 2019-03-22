@@ -71,7 +71,7 @@ function sendRequest() {
     // If response is a list of suggestions..
     if (content.firstElementChild.className === 'suggestion') {
       const heading = document.createElement('p');
-      heading.innerHTML = 'Did you mean to search for\u2014'
+      heading.innerHTML = 'Did you mean\u2014'
       content.prepend(heading);
       content.append(document.createElement('br'));
     }
@@ -96,7 +96,7 @@ function getStylesheet() {
 function createPopup(wordInfo) {  
   const popupNode = document.createElement('div');
   popupNode.className = 'popupNode';
-  popupNode.innerHTML = `<Br><p style='font-size:120%; text-align:center;'>Looking up the word "${wordInfo.word}"...</p>`;
+  popupNode.innerHTML = `<Br><p style='font-size:120%; text-align:center;'>Looking up "${wordInfo.word}"...</p>`;
 
 
   // Set popup position
@@ -374,7 +374,7 @@ function linkGoogle(selection) {
   const googleUrl = `https://www.google.com/search?q=${word}+definition`;
   const googleLink = document.createElement('span');
   googleLink.className = 'openInTab';
-  googleLink.innerHTML = 'Search on Google?';
+  googleLink.innerHTML = 'Search Google?';
   googleLink.onclick = () => {
     browser.runtime.sendMessage({
       url: googleUrl,

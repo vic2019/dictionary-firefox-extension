@@ -7,7 +7,7 @@ browser.runtime.onMessage.addListener(router);browser.bookmarks.onRemoved.addLis
 browser.menus.removeAll().then( () => {
   browser.menus.create({
     id: "Merriam-Webster dictionary extension",
-    title: "Look up in dictionary",
+    title: "Look Up in Dictionary",
     contexts: ["selection"]
   });
 });
