@@ -102,7 +102,9 @@ function createPopup(wordInfo) {
   // Set popup position
   const offsetHeight = 416;
   const offsetWidth = 408;
-  const scrollHeight = document.documentElement.scrollHeight;
+  
+  // const scrollHeight = document.documentElement.scrollHeight;
+  // const scrollWidth = document.documentElement.scrollWidth;
   const clientWidth = document.documentElement.clientWidth;
   
   let top = wordInfo.top - offsetHeight - 8;
@@ -112,15 +114,15 @@ function createPopup(wordInfo) {
   if (top < pageYOffset) {
       top = wordInfo.bottom + 8;
   }
-    
-  if (left < pageXOffset + 4) {
-    left = pageXOffset + 4;
-  }
-    
-    if (left > clientWidth - offsetWidth - 4) {
-    left = clientWidth - offsetWidth - 4;
+  
+  if (left > pageXOffset + clientWidth - offsetWidth - 3) {
+    left = pageXOffset + clientWidth - offsetWidth - 3;
   }
   
+  if (left < pageXOffset + 3) {
+    left = pageXOffset + 3;
+  }
+
   popupNode.style.top = top + 'px';
   popupNode.style.left = left + 'px';
   popupNode.style.position = 'absolute';

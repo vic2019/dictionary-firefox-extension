@@ -1,11 +1,12 @@
 .popupNode {
+  box-sizing: border-box;
   background: #eef0ff;
   border: 3px solid #D71920;
   border-radius: 9px;
   margin: 0px;
   padding: 10px 16px;
-  height: 390px;
-  width: 370px;
+  height: 416px;
+  width: 408px;
   box-shadow: 3px 4px 5px rgba(0, 0, 0, .3);
   overflow: scroll;
   font-family: Arial, Helvetica, sans-serif;

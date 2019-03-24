@@ -3,7 +3,7 @@
   "name": "Merriam-Webster's Learner's Dictionary",
   "short_name": "dictionary add-on",
   "version": "1.0.1",
-  "description": "Look up any word you want while browsing the Internet. Double-click the word to get its definition, pronunciation, and example sentences in a dialogue box on the same page. (This is a third-party extension.)",
+  "description": "Look up any word you want while browsing the Internet. Double-click the word to get its definition, pronunciation, and example sentences in a dialogue box on the same page.",
 
   "browser_specific_settings": {
     "gecko": {
