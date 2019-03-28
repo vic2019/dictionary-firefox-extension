@@ -76,25 +76,33 @@
   content: "]";
 }
 
-.sn-content .vi {
+.vi {
   display:list-item;
   list-style: square inside;
-  margin: 0.1em 0em 0.1em 3em; 
+  margin: 0.1em 0em 0.1em 3.5em;   
+}
+
+.sn-content .vi {
+  margin-left: 2.5em; 
 }
 
 .sn-content > .sn-box > .sn-content .vi {
-  margin: 0.1em 0em 0.1em 2em; 
+  margin-left: 1.5em; 
 }
 
-.sn-content .exampleButton {
+.exampleButton {
   display: list-item;
   list-style: none;
   color: #0000e4;
-  margin: 0.1em 0em 0.1em 3em;
+  margin: 0.1em 0em 0.1em 3.5em;  
+}
+
+.sn-content .exampleButton {
+  margin-left: 2.5em;
 }
 
 .sn-content > .sn-box > .sn-content .exampleButton {
-  margin: 0.1em 0em 0.1em 2em; 
+  margin-left: 1.5em; 
 }
 
 .vt {
