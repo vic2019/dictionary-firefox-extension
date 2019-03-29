@@ -38,6 +38,11 @@ function sendRequest() {
   document.body.append(shadowHost);
 
   const word = selection.toString().trim();
+  if (word.length > 100) {
+    notFoundPage(selection, popupNode);
+    return;
+  }
+
   let url;
 
   // Use a proxy if no key is given
@@ -96,7 +101,7 @@ function getStylesheet() {
 function createPopup(wordInfo) {  
   const popupNode = document.createElement('div');
   popupNode.className = 'popupNode';
-  popupNode.innerHTML = `<Br><p style='font-size:120%; text-align:center;'>Looking up "${wordInfo.word}"...</p>`;
+  popupNode.innerHTML = `<p style='font-size:140%; text-align:center;'>Looking up "${wordInfo.word}"...</p>`;
 
 
   // Set popup position
