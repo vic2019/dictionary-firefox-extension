@@ -1,7 +1,18 @@
 "user strict";
 
-document.addEventListener("dblclick", sendRequest);
+browser.runtime.onMessage.addListener( () => {
+  sendRequest();
+});
+
 document.addEventListener("click", removePopup);
+document.addEventListener("dblclick", sendRequest);
+
+browser.storage.local.get('mode').then( result => {
+  if (result.mode === 'context') {
+    document.removeEventListener('dblclick', sendRequest);
+  }
+});
+
 
 let KEY;
 browser.storage.local.get('key').then( result => {
@@ -9,18 +20,21 @@ browser.storage.local.get('key').then( result => {
 });
 
 
-// Update the API key
+// Update the API key or whether to allow launch from double-clicks
 browser.storage.onChanged.addListener( changes => {
   const key = changes.key;
-  if (!key) return;
-  if (key.oldValue !== key.newValue) {
-    KEY = key.newValue;
-  }
-});
-
-
-browser.runtime.onMessage.addListener( () => {
-  sendRequest();
+  const mode = changes.mode;
+  if (key) {
+    if (key.oldValue !== key.newValue) KEY = key.newValue;
+  } else {
+    if (mode) {
+      if (mode.newValue === 'context') {
+        document.removeEventListener('dblclick', sendRequest);
+      } else {
+        document.addEventListener("dblclick", sendRequest);
+      }
+    }
+  }  
 });
 
 

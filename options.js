@@ -1,3 +1,12 @@
+
+browser.storage.local.get('mode').then( result => {
+  if (result.mode === "context") {
+    document.getElementById('context').checked = true;
+  } else {
+    document.getElementById('dblclick').checked = true;
+  }
+});
+
 const notice = document.getElementById('notice');
 document.querySelector('#setKey').addEventListener('click', saveKey);
 document.querySelector('#default').addEventListener('click', event => {
@@ -5,6 +14,9 @@ document.querySelector('#default').addEventListener('click', event => {
   notice.style.color = '#00cc00';
   notice.innerHTML = 'Demo key saved!';
   event.preventDefault();
+});
+document.getElementById('setMode').addEventListener('change', event => {
+  browser.storage.local.set({ mode: event.target.value });
 });
 
 function saveKey(event) {
@@ -23,5 +35,4 @@ function saveKey(event) {
     key: key
   });
   event.preventDefault();
-
 }
