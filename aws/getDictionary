@@ -1,0 +1,30 @@
+const KEY = process.env.KEY;
+const URL = process.env.URL;
+const https = require('https');
+
+
+exports.handler = (event, context, callback) => {
+  const word = event.queryStringParameters['word'];
+  if (word.length > 100) return;
+  
+  const requestUrl = `${URL}/${word}?key=${KEY}`;
+  
+  https.get(requestUrl, res => {
+    let data = '';
+    
+    res.on('data', chunk => {
+      data += chunk; 
+    });
+    
+    res.on('end', () => {
+      callback(null, {
+          statusCode: 200,
+          body: data,
+          headers: {
+              'Content-Type': 'xml', // Must be 'xml' and not 'text/xml'
+          }  
+      });
+    });
+  });
+    
+};
